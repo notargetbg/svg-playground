@@ -8,15 +8,36 @@ const GameBoard = () => {
     const foodColor = 'red';
     const blocksCount = 20;
     const [isRunning, setIsRunning] = useState(true);
-    const [delay, setDelay] = useState(1000);
+    const [delay, setDelay] = useState(200);
     const blocks = new Array(blocksCount + 1).fill('block');
     const gameEl = useRef();
-    const [playerPosition, setPosition] = useState({x: 0, y: 0, direction: 'right' });
+    const [playerPosition, setPosition] = useState({x: 0, y: 0, direction: 'right', stepCount: 0, turnPosition: { x: 0, y: 0 }});
     const [hGap, setHorizontalGap] = useState(0);
     const [vGap, setVerticalGap] = useState(0);
     const randPosX = vGap * randomIntFromInterval(1, blocksCount - 1);
     const randPosY = hGap * randomIntFromInterval(1, blocksCount - 1);
     const [snakeFood, setSnakeFood] = useState({x: randPosX, y: randPosY});
+    const [foodBlocksEaten, setFoodBlocksEaten] = useState([]);
+
+    const isSnakeEating = snakeFood.x === playerPosition.x &&
+                            snakeFood.y === playerPosition.y;
+
+    useEffect(() => {
+        if (isSnakeEating) {
+            console.log('setting')
+            setFoodBlocksEaten(prevState => {
+                return [...prevState, {
+                    x: playerPosition.x,
+                    y: playerPosition.y
+                }];
+            });
+        }
+        setSnakeFood({
+            x: vGap * randomIntFromInterval(1, blocksCount - 1),
+            y: hGap * randomIntFromInterval(1, blocksCount - 1)
+        });
+        
+    }, [isSnakeEating]);
 
     useEffect(() => {
         setHorizontalGap(Math.ceil(gameEl.current.clientHeight / blocksCount));
@@ -36,19 +57,29 @@ const GameBoard = () => {
     // main game loop
     useInterval(() => {
         var seconds = new Date().getTime() / 1000;
-        console.log('move snake', seconds, snakeFood);
-        
+        // console.log('move snake', seconds, snakeFood);
+        const stepCount = foodBlocksEaten.length >= playerPosition.stepCount ?
+            playerPosition.stepCount + 1 :
+            playerPosition.stepCount;
+
         if (playerPosition.direction === 'left') {
             if (playerPosition.x === 0) {
                 endGame();
                 return;
             };
 
-
             setPosition({
                 ...playerPosition,
                 x: playerPosition.x - hGap,
+                stepCount: stepCount
             });
+
+            // setFoodBlocksEaten(foodBlocksEaten.map((item, i) => {
+            //     return {
+            //      x: playerPosition.x + ((i + stepCount) * hGap),
+            //      y: playerPosition.y - (stepCount) * hGap
+            //     }
+            // }));
         }
 
         if (playerPosition.direction === 'right') {
@@ -60,7 +91,15 @@ const GameBoard = () => {
             setPosition({
                 ...playerPosition,
                 x: playerPosition.x + hGap,
+                stepCount: stepCount
             });
+
+            // setFoodBlocksEaten(foodBlocksEaten.map((item, i) => {
+            //     return {
+            //      x: playerPosition.x - ((i + stepCount) * hGap),
+            //      y: playerPosition.y
+            //     }
+            //  }));
         }
 
         if (playerPosition.direction === 'top') {
@@ -71,8 +110,16 @@ const GameBoard = () => {
 
             setPosition({
                 ...playerPosition,
-                y: playerPosition.y - hGap,
+                y: playerPosition.y - vGap,
+                stepCount: stepCount
             });
+
+            // setFoodBlocksEaten(foodBlocksEaten.map((item, i) => {
+            //     return {
+            //      x: playerPosition.x,
+            //      y: playerPosition.y + (i * vGap)
+            //     }
+            // }));
         }
 
         if (playerPosition.direction === 'bottom') {
@@ -83,10 +130,25 @@ const GameBoard = () => {
 
             setPosition({
                 ...playerPosition,
-                y: playerPosition.y + hGap,
+                y: playerPosition.y + vGap,
+                stepCount: stepCount
             });
+
+            // setFoodBlocksEaten(foodBlocksEaten.map((item, i) => {
+            //     return {
+            //      x: playerPosition.x,
+            //      y: playerPosition.y - (i  * vGap)
+            //     }
+            // }));
         }
+
+        setFoodBlocksEaten([{ x: playerPosition.x, y: playerPosition.y }, ...foodBlocksEaten.slice(0, -1)]);
     }, isRunning ? delay : null);
+
+    const turnPosition = {
+        x: playerPosition.x,
+        y: playerPosition.y
+    };
 
     const move = () => (e) => {        
         if (!isRunning) {
@@ -94,14 +156,15 @@ const GameBoard = () => {
             return;
         }
 
-
         if (e.key === 'a') {
             if (playerPosition.x === 0) return;
 
             setPosition({
                 ...playerPosition,
+                turnPosition,
                 // x: playerPosition.x - hGap,
-                direction: 'left'
+                direction: 'left',
+                stepCount: 0
             });
         }
 
@@ -110,8 +173,10 @@ const GameBoard = () => {
 
             setPosition({
                 ...playerPosition,
+                turnPosition,
                 // x: playerPosition.x + hGap,
-                direction: 'right'
+                direction: 'right',
+                stepCount: 0
             });
         }
 
@@ -120,8 +185,10 @@ const GameBoard = () => {
 
             setPosition({
                 ...playerPosition,
+                turnPosition,
                 // y: playerPosition.y - vGap,
-                direction: 'top'
+                direction: 'top',
+                stepCount: 0
             });
         }
 
@@ -130,20 +197,27 @@ const GameBoard = () => {
 
             setPosition({
                 ...playerPosition,
+                turnPosition,
                 // y: playerPosition.y + vGap,
-                direction: 'bottom'
+                direction: 'bottom',
+                stepCount: 0
             });
         }
 
     };
 
-
+    const toggleGameState = () => {
+        isRunning ? setIsRunning(false) : setIsRunning(true);
+    };
 
     return (
         <div className='game-wrapper'
             tabIndex="0"
             onKeyDown={move()}
         >
+            <div className='game-actions'>
+                <button onClick={() => toggleGameState()}>{isRunning ? 'Pause' : 'Resume'}</button>
+            </div>
             <svg ref={gameEl}>
                 <g className='player'>
                     <rect
@@ -156,6 +230,40 @@ const GameBoard = () => {
                     >
                         x
                     </rect>
+                    {foodBlocksEaten.map((block, i) => {
+                        {/* let x, y;
+
+                        if (playerPosition.direction === 'top') {
+                            x = playerPosition.x
+                            y = playerPosition.y + (hGap * (i + 1))
+                        }
+
+                        if (playerPosition.direction === 'bottom') {
+                            x = playerPosition.x
+                            y = playerPosition.y - (hGap * (i + 1)) 
+                        }
+
+                        if (playerPosition.direction === 'left') {
+                            x = playerPosition.x + (vGap * (i + 1)) 
+                            y = playerPosition.y
+                        }
+
+                        if (playerPosition.direction === 'right') {
+                            x = playerPosition.x - (vGap * (i + 1)) 
+                            y = playerPosition.y
+                        } */}
+
+                        return <rect
+                            fill={playerColor}
+                            opacity={0.6}
+                            x={block.x}
+                            y={block.y} 
+                            width={vGap}
+                            height={hGap}
+                            rx="2">
+                            food
+                        </rect>
+                    })};
                 </g>
                 <g className='spawned-block'>
                     <rect

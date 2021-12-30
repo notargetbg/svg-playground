@@ -87,3 +87,8 @@ body {
 g.horizontal-lines {
     height: 100%;
 }
+
+.game-actions {
+    margin: 20px 0;
+    text-align: left;
+}
