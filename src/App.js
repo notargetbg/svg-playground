@@ -8,7 +8,7 @@ import GameBoard from './features/game/GameBoard';
 function App() {
   return (
     <div className="App">
-      <GameBoard />
+      <GameBoard gameName='snake' />
     </div>
   );
 }
