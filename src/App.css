@@ -91,3 +91,7 @@ g.horizontal-lines {
     margin: 20px 0;
     text-align: left;
 }
+
+.game-actions button {
+    float: right;
+}

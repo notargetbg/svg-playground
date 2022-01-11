@@ -43,14 +43,24 @@ const GameBoard = ({ gameName }) => {
         isRunning ? setIsRunning(false) : setIsRunning(true);
     };
 
+    const [score, setScore] = useState(0);
+
+    const handleSetScore = (score) => {
+        setScore((prevScore => {
+            return prevScore + score;
+        }));
+    }
+
     return (
         <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
             tabIndex="0"
         >
             <div className='game-actions'>
+                <strong>High score:</strong> {score}
+
                 <button onClick={() => toggleGameState()}>{isRunning ? 'Pause' : 'Resume'}</button>
             </div>
-            <SnakeGame vGap={vGap} hGap={hGap} blocksCount={blocksCountV} endGame={endGame} isRunning={isRunning}>
+            <SnakeGame vGap={vGap} hGap={hGap} blocksCount={blocksCountV} endGame={endGame} isRunning={isRunning} score={score} setScore={handleSetScore}>
                 <g className='horizontal-lines'>
                     {blocksH.map((block, i) => {
                         //  x1="0" y1="0" x2="100%" stroke="red" y2="0"
