@@ -16,7 +16,10 @@ import GameBoard from '../GameBoard';
     - add configuration
 */
 
-const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children }) => {
+// reset();
+
+
+const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children, score }) => {
     const baseScore = 50;
     const difficulty = 1;
     const playerColor = '#473dbd';
@@ -77,7 +80,14 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
                 };
             });
 
-            setScore(difficulty * baseScore);
+            const scoreIncrement = difficulty * baseScore
+            setScore(scoreIncrement);
+
+            // every 500 points we speed up the game
+            if ((score + scoreIncrement) % 100 === 0) {
+                console.log('speed up')
+                setDelay(delay - (delay * 0.25))
+            }
 
             const { x, y } = createFoodOutsideSnake(playerPosition, vGap, hGap);
 

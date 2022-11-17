@@ -71,7 +71,7 @@ const Draggable = ({ type }) => {
         <div className="container">
             {items.map(item => {
                 return (
-                    <div 
+                    <div
                         key={item}
                         draggable="true"
                         className={`box ${activeClass(item)}`}
