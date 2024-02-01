@@ -1,9 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, forwardRef, useImperativeHandle } from 'react';
 import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { randomIntFromInterval, useInterval } from '../../../app/utils';
-import GameBoard from '../GameBoard';
 
 /* 
     Game is working! Wohoo
@@ -18,17 +17,30 @@ import GameBoard from '../GameBoard';
 
 // reset();
 
+const initialPosition = {x: 0, y: 0, direction: 'right', stepCount: 0, foodBlocksEaten: [], turns: []};
+const initialDelay = 500;
 
-const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children, score }) => {
+const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children, score }, ref) => {
     const baseScore = 50;
     const difficulty = 1;
     const playerColor = '#473dbd';
     const foodColor = 'red';
-    const [delay, setDelay] = useState(200);
-    const [playerPosition, setPosition] = useState({x: 0, y: 0, direction: 'right', stepCount: 0, foodBlocksEaten: [], turns: []});
+    const [delay, setDelay] = useState(initialDelay);
+    const [playerPosition, setPosition] = useState(initialPosition);
     const randPosX = vGap * randomIntFromInterval(1, blocksCount - 1);
     const randPosY = hGap * randomIntFromInterval(1, blocksCount - 1);
     const [snakeFood, setSnakeFood] = useState({x: randPosX, y: randPosY});
+
+    const domRef = useRef(null);
+
+    const resetGame = useCallback(() => {
+        setPosition(initialPosition);
+        setSnakeFood({
+            x:  vGap * randomIntFromInterval(1, blocksCount - 1),
+            y: hGap * randomIntFromInterval(1, blocksCount - 1)}
+            )
+        setDelay(initialDelay)
+    }, [vGap, hGap, blocksCount])
 
     const isSnakeEating = snakeFood && (snakeFood.x === playerPosition.x &&
         snakeFood.y === playerPosition.y);
@@ -86,7 +98,7 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
             // every 500 points we speed up the game
             if ((score + scoreIncrement) % 100 === 0) {
                 console.log('speed up')
-                setDelay(delay - (delay * 0.25))
+                setDelay(delay - (delay * 0.05))
             }
 
             const { x, y } = createFoodOutsideSnake(playerPosition, vGap, hGap);
@@ -96,11 +108,11 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
         
     }, [isSnakeEating, playerPosition, createFoodOutsideSnake, vGap, hGap]);
 
-    useInterval(() => {
-        const { x, y } =  createFoodOutsideSnake(playerPosition, vGap, hGap);
-
-        setSnakeFood({ x, y });
-    }, isRunning ? 13500 : null);
+    // useInterval(() => {
+    //     const { x, y } =  createFoodOutsideSnake(playerPosition, vGap, hGap);
+        
+    //     setSnakeFood({ x, y });
+    // }, isRunning ? 13500 : null);
 
     // main game loop
     useInterval(() => {
@@ -212,9 +224,9 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
             return;
         }
 
-        console.log(e.key)
+        console.log(e)
 
-        if (e.key === 'a') {
+        if (e.key.toLowerCase() === 'a' || e.keyCode === 37) {
             const outOfBounds = playerPosition.x === 0;
             // const goingBackwards = direction rigth minus 1 block
 
@@ -229,12 +241,12 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
                 turns: [...playerPosition.turns, {
                     x: playerPosition.x,
                     y: playerPosition.y,
-                    direction: 'left'
+                    direction: `${playerPosition.direction}-left`
                 }]
             });
         }
 
-        if (e.key === 'd') {
+        if (e.key.toLowerCase() === 'd' || e.keyCode === 39) {
             const outOfBounds = (playerPosition.x >= (blocksCount * hGap) - hGap);
             if (outOfBounds || playerPosition.direction === 'left') return;
 
@@ -246,12 +258,12 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
                 turns: [...playerPosition.turns, {
                     x: playerPosition.x,
                     y: playerPosition.y,
-                    direction: 'right'
+                    direction: `${playerPosition.direction}-right`
                 }]
             });
         }
 
-        if (e.key === 'w') {
+        if (e.key.toLowerCase() === 'w' || e.keyCode === 38) {
             const outOfBounds = playerPosition.y === 0;
             if (outOfBounds || playerPosition.direction === 'bottom') return;
 
@@ -263,12 +275,12 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
                 turns: [...playerPosition.turns, {
                     x: playerPosition.x,
                     y: playerPosition.y,
-                    direction: 'top'
+                    direction: `${playerPosition.direction}-top`
                 }]
             });
         }
 
-        if (e.key === 's') {
+        if (e.key.toLowerCase() === 's' || e.keyCode === 40) {
             const outOfBounds = (playerPosition.y >= (blocksCount * vGap) - vGap);
             if (outOfBounds || playerPosition.direction === 'top') return;
 
@@ -280,15 +292,22 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
                 turns: [...playerPosition.turns, {
                     x: playerPosition.x,
                     y: playerPosition.y,
-                    direction: 'bottom'
+                    direction: `${playerPosition.direction}-bottom`
                 }]
             });
         }
 
-    };
+    };    
+
+    useImperativeHandle(ref, () => {
+        return {
+            domRef,
+            resetGame,
+        };
+      }, [resetGame]);
 
     return (
-            <svg tabIndex={0} onKeyDown={doTurn()}>
+            <svg tabIndex={0} onKeyDown={doTurn()} ref={domRef}>
                 {children}
                 <g className='mark-turn'>
                     {playerPosition.turns.map(turn => {
@@ -334,7 +353,7 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
                             >
                             food
                         </rect>
-                    })};
+                    })}
                 </g>
                 <g className='spawned-block'>
                     {snakeFood &&
@@ -354,4 +373,4 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
     );   
 }
 
-export default SnakeGame;
+export default forwardRef(SnakeGame);

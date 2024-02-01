@@ -1,4 +1,4 @@
-import React, { Children, useRef } from 'react';
+import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
@@ -26,11 +26,24 @@ const calculateGaps = (blocksCountV, blocksCountH) => {
     }
 }
 
+// on restart
+// show on screen message
+// get ready ...
+// hunt!
+
+let restartTimeout = null;
+
 const GameBoard = ({ gameName }) => {
+    const [message, setMessage] = useState('SNAKE');
+    const gameRef = useRef(null);
     const blocksCountV = 20;
     const blocksCountH = 20;
     const blocksH = new Array(blocksCountH + 1).fill('block');
     const blocksV = new Array(blocksCountV + 1).fill('block');
+
+    useEffect(() => {
+        gameRef.current.domRef.current.focus()
+    }, []);
 
     const { vGap , hGap } = calculateGaps(blocksCountV, blocksCountH);
     const [isRunning, setIsRunning] = useState(true); 
@@ -51,6 +64,22 @@ const GameBoard = ({ gameName }) => {
         }));
     }
 
+    const handleRestart = () => {
+        setIsRunning(false);
+        gameRef.current.resetGame();
+        restartTimeout = setTimeout(() => {
+            
+            setMessage('GET READY...')
+        },[0]);
+        restartTimeout = setTimeout(() => {
+            setMessage('HUNT!');
+            setIsRunning(true)
+        },[1500]);
+        setMessage('SNAKE');
+
+        gameRef.current.domRef.current.focus()
+    }
+
     return (
         <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
             tabIndex="0"
@@ -59,8 +88,10 @@ const GameBoard = ({ gameName }) => {
                 <strong>High score:</strong> {score}
 
                 <button onClick={() => toggleGameState()}>{isRunning ? 'Pause' : 'Resume'}</button>
+                <button onClick={() => handleRestart()} style={{marginRight: 10}}>Restart game</button>
             </div>
-            <SnakeGame vGap={vGap} hGap={hGap} blocksCount={blocksCountV} endGame={endGame} isRunning={isRunning} score={score} setScore={handleSetScore}>
+            {message && <h3>{message}</h3>}
+            <SnakeGame vGap={vGap} hGap={hGap} blocksCount={blocksCountV} endGame={endGame} isRunning={isRunning} score={score} setScore={handleSetScore} ref={gameRef}>
                 <g className='horizontal-lines'>
                     {blocksH.map((block, i) => {
                         //  x1="0" y1="0" x2="100%" stroke="red" y2="0"
