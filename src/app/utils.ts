@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useRef } from 'react';
 
-export function useInterval(callback, delay) {
-    const savedCallback = useRef();
+type RefCallback = () => void;
+
+export function useInterval(callback: () => void, delay: number) {
+    const savedCallback = useRef<RefCallback | null>();
   
     // Remember the latest callback.
     useEffect(() => {
@@ -11,8 +13,14 @@ export function useInterval(callback, delay) {
   
     // Set up the interval.
     useEffect(() => {
+      if (savedCallback.current === null) return;
+
+      console.log('setting interval');      
+
       function tick() {
-        savedCallback.current();
+        if (savedCallback.current) {
+          savedCallback.current();
+        } 
       }
       if (delay !== null) {
         let id = setInterval(tick, delay);
@@ -21,6 +29,6 @@ export function useInterval(callback, delay) {
     }, [delay]);
 }
 
-export function randomIntFromInterval(min, max) { // min and max included 
+export function randomIntFromInterval(min: number, max: number) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min);
 }

@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef, useImperativeHandle } from 'react';
+import React, { useRef } from 'react';
 import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
@@ -19,7 +19,7 @@ import SnakeGame from './snake/Snake';
 const width = 400;
 const height = 400;
 
-const calculateGaps = (blocksCountV, blocksCountH) => {
+const calculateGaps = (blocksCountV: number, blocksCountH: number) => {
     return {
         vGap: Math.ceil(width / blocksCountV),
         hGap : Math.ceil(height / blocksCountH),
@@ -33,15 +33,27 @@ const calculateGaps = (blocksCountV, blocksCountH) => {
 
 let restartTimeout = null;
 
-const GameBoard = ({ gameName }) => {
+interface GameBoardProps {
+    gameName: string;
+}
+
+type GameRef = { 
+    domRef: { 
+        current: { focus: () => void } 
+    },
+    resetGame: () => void 
+}
+
+const GameBoard = ({ gameName }: GameBoardProps) => {
     const [message, setMessage] = useState('SNAKE');
-    const gameRef = useRef(null);
+    const gameRef = useRef<GameRef | null>(null);
     const blocksCountV = 20;
     const blocksCountH = 20;
     const blocksH = new Array(blocksCountH + 1).fill('block');
     const blocksV = new Array(blocksCountV + 1).fill('block');
 
     useEffect(() => {
+        if (!gameRef.current) return;
         gameRef.current.domRef.current.focus()
     }, []);
 
@@ -58,7 +70,7 @@ const GameBoard = ({ gameName }) => {
 
     const [score, setScore] = useState(0);
 
-    const handleSetScore = (score) => {
+    const handleSetScore = (score: number) => {
         setScore((prevScore => {
             return prevScore + score;
         }));
@@ -66,23 +78,29 @@ const GameBoard = ({ gameName }) => {
 
     const handleRestart = () => {
         setIsRunning(false);
-        gameRef.current.resetGame();
-        restartTimeout = setTimeout(() => {
-            
-            setMessage('GET READY...')
-        },[0]);
-        restartTimeout = setTimeout(() => {
-            setMessage('HUNT!');
-            setIsRunning(true)
-        },[1500]);
-        setMessage('SNAKE');
+        try {
+            if (!gameRef.current) return;
 
-        gameRef.current.domRef.current.focus()
+            gameRef.current.resetGame();
+            restartTimeout = setTimeout(() => {
+                
+                setMessage('GET READY...')
+            }, 0);
+            restartTimeout = setTimeout(() => {
+                setMessage('HUNT!');
+                setIsRunning(true)
+            }, 1500);
+            setMessage('SNAKE');
+
+            gameRef.current.domRef.current.focus()
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
         <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
-            tabIndex="0"
+            tabIndex={0}
         >
             <div className='game-actions'>
                 <strong>High score:</strong> {score}

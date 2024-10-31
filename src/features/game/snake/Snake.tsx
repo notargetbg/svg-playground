@@ -17,16 +17,52 @@ import { randomIntFromInterval, useInterval } from '../../../app/utils';
 
 // reset();
 
-const initialPosition = {x: 0, y: 0, direction: 'right', stepCount: 0, foodBlocksEaten: [], turns: []};
-const initialDelay = 500;
+interface Position {
+    x: number;
+    y: number;
+}
 
-const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children, score }, ref) => {
+interface Turn extends Position {
+    direction: string;
+}
+
+type playerPosition = {
+    x: number;
+    y: number;
+    direction: string;
+    stepCount: number;
+    foodBlocksEaten: Position[];
+    turns: Turn[];
+}
+
+const initialPosition: playerPosition = {x: 0, y: 0, direction: 'right', stepCount: 0, foodBlocksEaten: [], turns: []};
+const initialDelay: number = 500;
+interface SnakeGameProps {
+    isRunning: boolean;
+    blocksCount: number;
+    vGap: number;
+    hGap: number;
+    endGame: () => void;
+    setScore: (score: number) => void;
+    children: React.ReactNode;
+    score: number;
+}
+
+
+const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children, score }: SnakeGameProps, ref) => {
     const baseScore = 50;
     const difficulty = 1;
     const playerColor = '#473dbd';
     const foodColor = 'red';
     const [delay, setDelay] = useState(initialDelay);
-    const [playerPosition, setPosition] = useState(initialPosition);
+    const [playerPosition, setPosition] = useState<{
+        x: number;
+        y: number;
+        direction: string;
+        stepCount: number;
+        foodBlocksEaten: Position[];
+        turns: Turn[];
+    }>(initialPosition);
     const randPosX = vGap * randomIntFromInterval(1, blocksCount - 1);
     const randPosY = hGap * randomIntFromInterval(1, blocksCount - 1);
     const [snakeFood, setSnakeFood] = useState({x: randPosX, y: randPosY});
@@ -46,7 +82,7 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
         snakeFood.y === playerPosition.y);
 
     // compare in different way look at x and y same time for each position!
-    const createFoodOutsideSnake = useCallback((pPos, vg, hg) => {
+    const createFoodOutsideSnake = useCallback((pPos: playerPosition, vg: number, hg: number) => {
         let x = vg * randomIntFromInterval(1, blocksCount - 1);
         let y = hg * randomIntFromInterval(1, blocksCount - 1);
 
@@ -216,9 +252,9 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
             }),
         });
 
-    }, isRunning ? delay : null);
+    }, isRunning ? delay : initialDelay);
 
-    const doTurn = () => (e) => {
+    const doTurn = () => (e: React.KeyboardEvent<SVGSVGElement>) => {
         if (!isRunning) {
             console.log('game ended!')
             return;
@@ -371,6 +407,6 @@ const SnakeGame = ({ isRunning, blocksCount, vGap, hGap, endGame, setScore, chil
                 </g>
             </svg>
     );   
-}
+})
 
-export default forwardRef(SnakeGame);
+export default SnakeGame;

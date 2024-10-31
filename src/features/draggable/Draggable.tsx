@@ -1,40 +1,44 @@
-import React, { useState } from 'react';
+import React, { DragEventHandler, useState } from 'react';
 
-let dragSrcEl;
+let dragSrcEl: HTMLElement;
 
-const Draggable = ({ type }) => {
-    const [active, setActive] = useState(null);
+interface DraggableProps {
+    type: 'elementDrop' | 'fileDrop';
+}
+
+const Draggable = ({ type }: DraggableProps) => {
+    const [active, setActive] = useState<string | null>(null);
     const items = ['A', 'B', 'C'];
 
-    const activeClass = (item) => {
+    const activeClass = (item: string) => {
         return active === item ? 'over' : '';
     };
 
-
-
-    const handleDragStart = (e) => {
-        e.target.style.opacity = '0.2';
+    const handleDragStart: DragEventHandler<HTMLDivElement> = (e) => {
+        (e.target as HTMLElement).style.opacity = '0.2';
 
         // DataTransfer
-        dragSrcEl = e.target;
+        dragSrcEl = e.target as HTMLElement;
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/html', e.target.innerHTML);
+        e.dataTransfer.setData('text/html', (e.target as HTMLElement).innerHTML);
     };
 
-    const handleDragEnd = (e) => {
-        e.target.style.opacity = '1';
+    const handleDragEnd: DragEventHandler<HTMLDivElement> = (e) => {
+        (e.target as HTMLElement).style.opacity = '1';
         setActive(null);
     };
 
-    const handleDragEnter = (item) => (e) => {
+    const handleDragEnter = (item: string): DragEventHandler<HTMLDivElement> => (e) => {
+        console.log(e);
         setActive(item);
     };
 
-    const handleDragLeave = (e) => {
+    const handleDragLeave = (): DragEventHandler<HTMLDivElement> => (e) => {
+        console.log(e);
         setActive(null);
     };
 
-    const handleDragOver = (e) => {
+    const handleDragOver = (): DragEventHandler<HTMLDivElement> => (e) => {
         if (e.preventDefault) {
           e.preventDefault();
         }
@@ -42,7 +46,7 @@ const Draggable = ({ type }) => {
         return false;
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = (e: any) => {
         
         e.stopPropagation();
         e.preventDefault();
