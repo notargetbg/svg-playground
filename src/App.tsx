@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import { Counter } from './features/counter/Counter';
 import Draggable from './features/draggable/Draggable';
 import './App.css';
