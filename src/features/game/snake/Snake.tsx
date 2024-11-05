@@ -97,7 +97,7 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
 
             const isInBody = allBlocks.some(block => {
                 return block.x === newX && block.y === newY;
-            });            
+            });
 
             if (!isInBody) {
                 console.log('not in body!')
@@ -155,6 +155,10 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
         const stepCount = playerPosition.foodBlocksEaten.length >= playerPosition.stepCount ?
             playerPosition.stepCount + 1 :
             playerPosition.stepCount;
+
+        if (!isRunning) {
+            return;
+        }
 
         let newPosition = {
             ...playerPosition,
@@ -252,7 +256,7 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
             }),
         });
 
-    }, isRunning ? delay : initialDelay);
+    }, delay);
 
     const doTurn = () => (e: React.KeyboardEvent<SVGSVGElement>) => {
         if (!isRunning) {
@@ -346,7 +350,7 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
             <svg tabIndex={0} onKeyDown={doTurn()} ref={domRef}>
                 {children}
                 <g className='mark-turn'>
-                    {playerPosition.turns.map(turn => {
+                    {/* {playerPosition.turns.map(turn => {
                         return (
                             <rect
                                 fill={playerColor}
@@ -359,7 +363,7 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
                                 x
                             </rect>
                         );
-                    })}
+                    })} */}
                 </g>
                 <g className='player'>
                     <rect

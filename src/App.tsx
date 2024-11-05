@@ -4,11 +4,14 @@ import { Counter } from './features/counter/Counter';
 import Draggable from './features/draggable/Draggable';
 import './App.css';
 import GameBoard from './features/game/GameBoard';
+import { GamesProvider } from './features/game/GameBoard.data';
 
 function App() {
   return (
     <div className="App">
-      <GameBoard gameName='snake' />
+      <GamesProvider>
+        <GameBoard gameName='snake' />
+      </GamesProvider>      
     </div>
   );
 }

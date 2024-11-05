@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { randomIntFromInterval, useInterval } from '../../app/utils';
 import SnakeGame from './snake/Snake';
+import { useGamesState } from './GameBoard.data';
 
 /* 
     Game is working! Wohoo
@@ -45,16 +46,20 @@ type GameRef = {
 }
 
 const GameBoard = ({ gameName }: GameBoardProps) => {
-    const [message, setMessage] = useState('SNAKE');
+    const { gameBoards, activeGame } = useGamesState();
+    const dispatchGame
+    console.log(gameBoards);
+    
+
+    const { blocksCountH, blocksCountV, blocksH, blocksV } = gameBoards[activeGame.toLowerCase()];
+    const [message, setMessage] = useState('GAME RUNNING');
     const gameRef = useRef<GameRef | null>(null);
-    const blocksCountV = 20;
-    const blocksCountH = 20;
-    const blocksH = new Array(blocksCountH + 1).fill('block');
-    const blocksV = new Array(blocksCountV + 1).fill('block');
+
+    // console.log(blocksCountH, blocksCountV, blocksH, blocksV);
 
     useEffect(() => {
         if (!gameRef.current) return;
-        gameRef.current.domRef.current.focus()
+        gameRef.current.domRef.current.focus();
     }, []);
 
     const { vGap , hGap } = calculateGaps(blocksCountV, blocksCountH);
@@ -96,17 +101,23 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
         } catch (error) {
             console.log(error);
         }
-    }
+    }   
 
     return (
         <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
             tabIndex={0}
         >
-            <div className='game-actions'>
-                <strong>High score:</strong> {score}
 
-                <button onClick={() => toggleGameState()}>{isRunning ? 'Pause' : 'Resume'}</button>
-                <button onClick={() => handleRestart()} style={{marginRight: 10}}>Restart game</button>
+            <div className='menu'>
+                <h1>Snake</h1>
+                <div className='game-actions'>
+                    <strong>High score:</strong> {score}
+
+                    <button  onClick={() => toggleGameState()}>{isRunning ? 'Pause' : 'Resume'}</button>
+                    <button onClick={() => handleRestart()} style={{marginRight: 10}}>Restart game</button>
+                </div>
+
+
             </div>
             {message && <h3>{message}</h3>}
             <SnakeGame vGap={vGap} hGap={hGap} blocksCount={blocksCountV} endGame={endGame} isRunning={isRunning} score={score} setScore={handleSetScore} ref={gameRef}>
