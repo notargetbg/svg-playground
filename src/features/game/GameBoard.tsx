@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { randomIntFromInterval, useInterval } from '../../app/utils';
 import SnakeGame from './snake/Snake';
-import { useGamesState } from './GameBoard.data';
+import { useGamesDispatch, useGamesState } from './GameBoard.data';
 
 /* 
     Game is working! Wohoo
@@ -47,7 +47,7 @@ type GameRef = {
 
 const GameBoard = ({ gameName }: GameBoardProps) => {
     const { gameBoards, activeGame } = useGamesState();
-    const dispatchGame
+    const dispatchGame = useGamesDispatch();
     console.log(gameBoards);
     
 
