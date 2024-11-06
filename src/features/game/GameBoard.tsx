@@ -50,7 +50,7 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
     const dispatchGame = useGamesDispatch();
     console.log(gameBoards);
     
-
+    // todo: make dynamic and animate snake movement smoothly
     const { blocksCountH, blocksCountV, blocksH, blocksV } = gameBoards[activeGame.toLowerCase()];
     const [message, setMessage] = useState('GAME RUNNING');
     const gameRef = useRef<GameRef | null>(null);
