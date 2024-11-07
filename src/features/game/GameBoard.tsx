@@ -101,7 +101,15 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
         } catch (error) {
             console.log(error);
         }
-    }   
+    }
+    
+    const handleSaveGame = useCallback(() => {
+        dispatchGame({ type: 'SAVE_GAME', payload: { gameName: activeGame, score } });
+    }, [score, activeGame, dispatchGame]);
+
+    const handleLoadGame = useCallback(() => {
+        dispatchGame({ type: 'LOAD_GAME', payload: { gameName: activeGame } });
+    }, [activeGame, dispatchGame]);
 
     return (
         <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
@@ -120,40 +128,54 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
 
             </div>
             {message && <h3>{message}</h3>}
-            <SnakeGame vGap={vGap} hGap={hGap} blocksCount={blocksCountV} endGame={endGame} isRunning={isRunning} score={score} setScore={handleSetScore} ref={gameRef}>
-                <g className='horizontal-lines'>
-                    {blocksH.map((block, i) => {
-                        //  x1="0" y1="0" x2="100%" stroke="red" y2="0"
-                        return <line
-
-                            key={`item-${i}`}
-                            stroke='#274dc9'
-                            // stroke-width="1"
-                            x1={(vGap * i)}
-                            x2={(vGap * i)}
-                            y1={0}
-                            y2='100%'
-                        />
-                    })}
-                </g>
-
-                <g className='vertical-lines'>
-                    {blocksV.map((block, i) => {
-                        return <line 
-                            key={`item-${i}`}
-                            stroke='#274dc9'
-                            // stroke-width="1"
-                            x1={0}
-                            x2='100%'
-                            y1={(hGap * i)}
-                            y2={(hGap * i)}
-                        />
-                    })}
-
-                </g>
+            <SnakeGame 
+                vGap={vGap} 
+                hGap={hGap} 
+                blocksCount={blocksCountV} 
+                endGame={endGame} 
+                isRunning={isRunning} 
+                score={score} 
+                setScore={handleSetScore} 
+                ref={gameRef}
+                saveGame={handleSaveGame}
+                loadGame={handleLoadGame}
+            >
+               
             </SnakeGame>
         </div>
     );   
 }
 
 export default GameBoard;
+
+
+{/* <g className='horizontal-lines'>
+{blocksH.map((block, i) => {
+    //  x1="0" y1="0" x2="100%" stroke="red" y2="0"
+    return <line
+
+        key={`item-${i}`}
+        stroke='#274dc9'
+        // stroke-width="1"
+        x1={(vGap * i)}
+        x2={(vGap * i)}
+        y1={0}
+        y2='100%'
+    />
+})}
+</g>
+
+<g className='vertical-lines'>
+{blocksV.map((block, i) => {
+    return <line 
+        key={`item-${i}`}
+        stroke='#274dc9'
+        // stroke-width="1"
+        x1={0}
+        x2='100%'
+        y1={(hGap * i)}
+        y2={(hGap * i)}
+    />
+})}
+
+</g> */}

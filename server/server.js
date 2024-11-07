@@ -9,8 +9,7 @@ var express_1 = __importDefault(require("express"));
 var body_parser_1 = __importDefault(require("body-parser"));
 // load cors
 var cors_1 = __importDefault(require("cors"));
-// load mysql
-var mysql_1 = __importDefault(require("mysql"));
+var db_1 = require("./core/db");
 // Add dotenv
 var dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -28,41 +27,8 @@ app.use((0, cors_1.default)());
 app.get('/', function (req, res) {
     res.send('Hello World!');
 });
+(0, db_1.createConnection)();
 // listen to the port
 app.listen(port, function () {
     console.log("Server running on port ".concat(port));
-});
-function logErrorMessage(value) {
-    console.log("Error: ".concat(value, " is not set. Aborting and will not attempt to connect to database."));
-}
-var dbHost = process.env.DB_HOST;
-var dbUser = process.env.DB_USER;
-var dbPassword = process.env.DB_PASSWORD;
-var dbName = process.env.DB_NAME;
-if (!dbHost) {
-    logErrorMessage('DB_HOST');
-    process.exit(1);
-}
-if (!dbUser) {
-    logErrorMessage('DB_USER');
-    process.exit(1);
-}
-if (!dbName) {
-    logErrorMessage('DB_NAME');
-    process.exit(1);
-}
-// create connection to the database
-var db = mysql_1.default.createConnection({
-    host: dbHost,
-    user: dbUser,
-    password: dbPassword,
-    database: dbName
-});
-// connect to database
-db.connect(function (err) {
-    if (err) {
-        console.log('There is an error connecting to database. Aborting');
-        throw err;
-    }
-    console.log('Connected to database');
 });
