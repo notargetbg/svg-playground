@@ -11,6 +11,9 @@ var body_parser_1 = __importDefault(require("body-parser"));
 var cors_1 = __importDefault(require("cors"));
 // load mysql
 var mysql_1 = __importDefault(require("mysql"));
+// Add dotenv
+var dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 // create express app
 var app = (0, express_1.default)();
 // setup the server port
@@ -29,12 +32,31 @@ app.get('/', function (req, res) {
 app.listen(port, function () {
     console.log("Server running on port ".concat(port));
 });
+function logErrorMessage(value) {
+    console.log("Error: ".concat(value, " is not set. Aborting and will not attempt to connect to database."));
+}
+var dbHost = process.env.DB_HOST;
+var dbUser = process.env.DB_USER;
+var dbPassword = process.env.DB_PASSWORD;
+var dbName = process.env.DB_NAME;
+if (!dbHost) {
+    logErrorMessage('DB_HOST');
+    process.exit(1);
+}
+if (!dbUser) {
+    logErrorMessage('DB_USER');
+    process.exit(1);
+}
+if (!dbName) {
+    logErrorMessage('DB_NAME');
+    process.exit(1);
+}
 // create connection to the database
 var db = mysql_1.default.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'snake_game' // use from .env file
+    host: dbHost,
+    user: dbUser,
+    password: dbPassword,
+    database: dbName
 });
 // connect to database
 db.connect(function (err) {

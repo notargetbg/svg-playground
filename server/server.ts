@@ -6,6 +6,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 // load mysql
 import mysql from 'mysql';
+// Add dotenv
+import dotenv from 'dotenv';
+dotenv.config();
 
 // create express app
 const app = express();
@@ -29,12 +32,37 @@ app.listen(port, () => {
 	console.log(`Server running on port ${port}`);
 });
 
+function logErrorMessage(value: string): void {
+	console.log(`Error: ${value} is not set. Aborting and will not attempt to connect to database.`);
+}
+
+const dbHost = process.env.DB_HOST;
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const dbName = process.env.DB_NAME;
+
+
+if (!dbHost) {
+	logErrorMessage('DB_HOST');
+	process.exit(1);
+}
+
+if (!dbUser) {
+	logErrorMessage('DB_USER');
+	process.exit(1);
+}
+
+if (!dbName) {
+	logErrorMessage('DB_NAME');
+	process.exit(1);
+}
+
 // create connection to the database
 const db = mysql.createConnection({
-	host: 'localhost', // use from .env file
-	user: 'root', // use from .env file
-	password: '', // use from .env file
-	database: 'snake_game' // use from .env file
+	host: dbHost,
+	user: dbUser,
+	password: dbPassword,
+	database: dbName
 });
 
 // connect to database
