@@ -14,4 +14,7 @@ export interface GameState {
 	activeGame: string;
 	isRunning: boolean;
 	gameBoards: GameBoards;
+    score: number;
+    statusMessage: string;
 }
+

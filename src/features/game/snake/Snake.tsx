@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { randomIntFromInterval, useInterval } from '../../../app/utils';
+import { useEffectCustom } from '../../../hooks/customUseEffect';
+import { updateGameField, useGamesDispatch } from '../GameBoard.data';
 
 /* 
     Game is working! Wohoo
@@ -35,7 +37,23 @@ type playerPosition = {
     turns: Turn[];
 }
 
-const initialPosition: playerPosition = {x: 0, y: 0, direction: 'right', stepCount: 0, foodBlocksEaten: [], turns: []};
+const getRandPosition = (blocksCount: number, vGap: number, hGap: number): Position => ({
+    x: randomIntFromInterval(1, blocksCount - 1) * vGap,
+    y: randomIntFromInterval(1, blocksCount - 1) * hGap
+});
+
+const getInitialPlayerPosition = (blocksCount: number, vGap: number, hGap: number): playerPosition => {
+    const position = getRandPosition(blocksCount, vGap, hGap);
+    return {
+        x: position.x,
+        y: position.y,
+        direction: 'right', // randomize direction using lodash
+        stepCount: 0, 
+        foodBlocksEaten: [], 
+        turns: []
+    }
+};
+
 const initialDelay: number = 500;
 interface SnakeGameProps {
     isRunning: boolean;
@@ -48,8 +66,8 @@ interface SnakeGameProps {
     score: number;
 }
 
-
 const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children, score }: SnakeGameProps, ref) => {
+    const initialPlayerPosition = getInitialPlayerPosition(blocksCount, vGap, hGap);
     const baseScore = 50;
     const difficulty = 1;
     const playerColor = '#473dbd';
@@ -62,21 +80,65 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
         stepCount: number;
         foodBlocksEaten: Position[];
         turns: Turn[];
-    }>(initialPosition);
+    }>(initialPlayerPosition);
     const randPosX = vGap * randomIntFromInterval(1, blocksCount - 1);
     const randPosY = hGap * randomIntFromInterval(1, blocksCount - 1);
     const [snakeFood, setSnakeFood] = useState({x: randPosX, y: randPosY});
 
-    const domRef = useRef(null);
+    const dispatch = useGamesDispatch();
 
+    // useEffectCustom();
+
+    const domRef = useRef(null);
     const resetGame = useCallback(() => {
-        setPosition(initialPosition);
+        setPosition(initialPlayerPosition);
+        const randomPosition = getRandPosition(blocksCount, vGap, hGap);
         setSnakeFood({
-            x:  vGap * randomIntFromInterval(1, blocksCount - 1),
-            y: hGap * randomIntFromInterval(1, blocksCount - 1)}
-            )
+            x:  randomPosition.x,
+            y: randomPosition.y
+        });
         setDelay(initialDelay)
-    }, [vGap, hGap, blocksCount])
+    }, [initialPlayerPosition, vGap, hGap, blocksCount]);
+
+    const getGameState = useCallback(() => {
+        return {
+            playerPosition,
+            snakeFood,
+            delay
+        }
+    }, [playerPosition, snakeFood, delay]);
+
+    const loadGame = useCallback(() => {
+        console.log('loading game ...');
+        // simulate loading time with timeout for now
+        // todo - add loading spinner
+        setTimeout(() => {
+            console.log('game loaded!');
+            dispatch(updateGameField('statusMessage', 'SNAKE'));
+
+            const savedGame = localStorage.getItem('snake-game');
+                if (!savedGame) {
+                    console.log('no saved game')
+                    return;
+                }
+
+                const { playerPosition, snakeFood, delay } = JSON.parse(savedGame);
+
+                setPosition(playerPosition);
+                setSnakeFood(snakeFood);
+                setDelay(delay);
+        }, 2000)
+
+    }, []);
+
+    useImperativeHandle(ref, () => {
+        return {
+            domRef,
+            resetGame,
+            loadGame,
+            getGameState
+        };
+      }, [resetGame, getGameState, loadGame]);
 
     const isSnakeEating = snakeFood && (snakeFood.x === playerPosition.x &&
         snakeFood.y === playerPosition.y);
@@ -337,14 +399,7 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
             });
         }
 
-    };    
-
-    useImperativeHandle(ref, () => {
-        return {
-            domRef,
-            resetGame,
-        };
-      }, [resetGame]);
+    };
 
     return (
             <svg tabIndex={0} onKeyDown={doTurn()} ref={domRef}>

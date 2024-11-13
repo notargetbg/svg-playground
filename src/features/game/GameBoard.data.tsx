@@ -1,18 +1,7 @@
 import { createContext, Dispatch, useReducer, ReactNode, useContext } from 'react';
 import { GameBoards, GameState } from './GameBoard.types';
 
-export const GamesContext = createContext<GameState>({ activeGame: 'snake', isRunning: false, gameBoards: {} });
-export const GamesDispatchContext = createContext<Dispatch<any> | null>(null);
-
-function getBoardByCountVH(blocksCountV: number, blocksCountH: number) {
-    return {
-        blocksCountH,
-        blocksCountV,
-        blocksH: Array.from({ length: blocksCountH }, (_, i) => i),
-        blocksV: Array.from({ length: blocksCountV }, (_, i) => i),
-    }
-}
-
+// All game boards as a board configuration
 const gameBoards: GameBoards = {
     snake: {
 		info: "Snake game. You know the rules",
@@ -21,10 +10,25 @@ const gameBoards: GameBoards = {
     tetris: getBoardByCountVH(20, 10),
 }
 
+// Initial game state
 const initialState: GameState = {
 	activeGame: 'snake',
 	isRunning: false,
 	gameBoards,
+	statusMessage: 'Game Running',
+	score: 0
+}
+
+export const GamesContext = createContext<GameState>(initialState);
+export const GamesDispatchContext = createContext<Dispatch<any>>(() => {});
+
+function getBoardByCountVH(blocksCountV: number, blocksCountH: number) {
+    return {
+        blocksCountH,
+        blocksCountV,
+        blocksH: Array.from({ length: blocksCountH }, (_, i) => i),
+        blocksV: Array.from({ length: blocksCountV }, (_, i) => i),
+    }
 }
 
 interface GamesProviderProps {
@@ -53,19 +57,44 @@ export function useGamesState(): GameState {
 }
 
 export function useGamesDispatch() {
+	if (!useContext(GamesDispatchContext)) {
+		throw new Error('dispatch must be used within a GamesDispatchContext Provider');
+	}
+
 	return useContext(GamesDispatchContext);
 }
 
+// export action creators
+
+export function setGame(game: string) {
+	return { type: 'SET_GAME', payload: game }
+}
+
+export function updateGameField(field: string, value: any) {
+	return { type: 'UPDATE_GAME_FIELD', payload: { field, value } }
+}
+
 function gamesReducer(gameState: GameState, action: any ) {
+
+	// console.log('GAMES REDUCER ACTION', action);
+	// console.log('GAMES REDUCER STATE', gameState);
+
 	switch (action.type) {
+		// when choosing a game, we set active game string key
 		case 'SET_GAME':
 			return { ...gameState, activeGame: action.payload }
-		case 'PAUSE_GAME':
-			return { ...gameState, activeGame: null }
+		case 'TOGGLE_PAUSE_GAME':
+			return { ...gameState, isRunning: !gameState.isRunning }
+		case 'END_GAME': 
+			return { ...gameState, isRunning: false }
+		case 'RESTART_GAME':
+			return { ...gameState, isRunning: true }
+		case 'UPDATE_GAME_FIELD': {
+			console.log('UPDATE_GAME_FIELD', action);
+			return { ...gameState, [action.payload.field]: action.payload.value }
+		}
 
 		default:
 			return gameState;
 	}
 }
-
-
