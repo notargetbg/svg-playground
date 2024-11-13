@@ -18,10 +18,10 @@ import GridGameboard from './GameBoard/GridGameboard';
     - add configuration
 */
 
-const width = 400;
-const height = 400;
-
-const calculateGaps = (blocksCountV: number, blocksCountH: number) => {
+const calculateGaps = (blocksCountV: number, blocksCountH: number, size: number) => {
+    const width = blocksCountH * size;
+    const height = blocksCountV * size;
+    
     return {
         vGap: Math.ceil(width / blocksCountV),
         hGap : Math.ceil(height / blocksCountH),
@@ -54,8 +54,10 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
     const dispatch = useGamesDispatch();
     
     // todo: make dynamic and animate snake movement smoothly
-    const { blocksCountH, blocksCountV, blocksH, blocksV } = gameBoards[activeGame.toLowerCase()];
-    const { vGap , hGap } = calculateGaps(blocksCountV, blocksCountH);
+    const { blocksCountH, blocksCountV, blocksH, blocksV, size } = gameBoards[activeGame.toLowerCase()];
+    const { vGap , hGap } = calculateGaps(blocksCountV, blocksCountH, size);
+
+    console.log(vGap, hGap, blocksCountV, blocksCountH, blocksH, blocksV, size);
 
     useEffect(() => {
         if (!gameRef.current) return;
@@ -116,15 +118,21 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
     }, [dispatch]);
 
     const handleEndGame = () => {
-        dispatch('END_GAME');
+        dispatch({ type: 'END_GAME' });
     };
+
+    const width = blocksCountH * size;
+    const height = blocksCountV * size
 
     return (
         <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
             tabIndex={0}
         >
             <div className='menu'>
-                <h1>Snake</h1>
+                <h1>{activeGame}</h1>
+                <select onChange={(e) => dispatch({ type: 'SET_GAME', payload: e.target.value })}>
+                    {Object.keys(gameBoards).map((game) => <option key={game} value={game}>{game}</option>)}
+                </select>
                 <div className='game-actions'>
                     <strong>High score:</strong> {score}
 
@@ -157,7 +165,7 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
                 setScore={handleSetScore} 
                 ref={gameRef}
             >
-                <GridGameboard blocksH={blocksH} blocksV={blocksV} vGap={vGap} hGap={hGap} />
+                <GridGameboard blocksH={blocksH} blocksV={blocksV} vGap={vGap} hGap={hGap} size={size} />
             </SnakeGame>
         </div>
     );   

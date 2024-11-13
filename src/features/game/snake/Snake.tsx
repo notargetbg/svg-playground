@@ -122,14 +122,15 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
                     return;
                 }
 
-                const { playerPosition, snakeFood, delay } = JSON.parse(savedGame);
+                const { playerPosition, snakeFood, delay, score} = JSON.parse(savedGame);
 
                 setPosition(playerPosition);
                 setSnakeFood(snakeFood);
                 setDelay(delay);
-        }, 2000)
+                setScore(score);
+        }, 2000);
 
-    }, []);
+    }, [dispatch]);
 
     useImperativeHandle(ref, () => {
         return {
@@ -145,12 +146,12 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
 
     // compare in different way look at x and y same time for each position!
     const createFoodOutsideSnake = useCallback((pPos: playerPosition, vg: number, hg: number) => {
-        let x = vg * randomIntFromInterval(1, blocksCount - 1);
-        let y = hg * randomIntFromInterval(1, blocksCount - 1);
+        let foodPosX = vg * randomIntFromInterval(1, blocksCount - 1);
+        let foodPosY = hg * randomIntFromInterval(1, blocksCount - 1);
 
         const allBlocks = [{ x: pPos.x, y: pPos.y }, ...pPos.foodBlocksEaten];
         const isInBody = allBlocks.some(block => {
-            return block.x === x && block.y === y;
+            return block.x === foodPosX && block.y === foodPosY;
         });
 
         while (isInBody) {
@@ -162,18 +163,18 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
             });
 
             if (!isInBody) {
-                console.log('not in body!')
-                x = newX;
-                y = newY;
+                // found a position outside the snake
+                foodPosX = newX;
+                foodPosY = newY;
                 
                 break;
             }
 
-            x = newX;
-            y = newY;
+            foodPosX = newX;
+            foodPosY = newY;
         }
 
-        return { x, y }
+        return { x: foodPosX, y: foodPosY }
     }, [blocksCount]);
 
     // Todo: fix this

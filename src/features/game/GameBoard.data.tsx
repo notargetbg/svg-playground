@@ -5,9 +5,9 @@ import { GameBoards, GameState } from './GameBoard.types';
 const gameBoards: GameBoards = {
     snake: {
 		info: "Snake game. You know the rules",
-		...getBoardByCountVH(20, 20)
+		...getBoardByCountVH(20, 20, 20)
 	},
-    tetris: getBoardByCountVH(20, 10),
+    tetris: getBoardByCountVH(20, 10, 20),
 }
 
 // Initial game state
@@ -22,12 +22,13 @@ const initialState: GameState = {
 export const GamesContext = createContext<GameState>(initialState);
 export const GamesDispatchContext = createContext<Dispatch<any>>(() => {});
 
-function getBoardByCountVH(blocksCountV: number, blocksCountH: number) {
+function getBoardByCountVH(blocksCountV: number, blocksCountH: number, size: number) {
     return {
         blocksCountH,
         blocksCountV,
-        blocksH: Array.from({ length: blocksCountH }, (_, i) => i),
-        blocksV: Array.from({ length: blocksCountV }, (_, i) => i),
+        blocksH: Array.from({ length: blocksCountH }, (_, i) => i + 1),
+        blocksV: Array.from({ length: blocksCountV }, (_, i) => i + 1),
+		size
     }
 }
 
@@ -56,7 +57,7 @@ export function useGamesState(): GameState {
 	return useContext(GamesContext);
 }
 
-export function useGamesDispatch() {
+export function useGamesDispatch(): Dispatch<{ type: string, payload?: any }> {
 	if (!useContext(GamesDispatchContext)) {
 		throw new Error('dispatch must be used within a GamesDispatchContext Provider');
 	}
@@ -80,12 +81,15 @@ function gamesReducer(gameState: GameState, action: any ) {
 	// console.log('GAMES REDUCER STATE', gameState);
 
 	switch (action.type) {
+
 		// when choosing a game, we set active game string key
 		case 'SET_GAME':
 			return { ...gameState, activeGame: action.payload }
 		case 'TOGGLE_PAUSE_GAME':
 			return { ...gameState, isRunning: !gameState.isRunning }
-		case 'END_GAME': 
+		case 'LOAD_GAME':
+			return { ...gameState, isRunning: false, activeGame: action.payload.gameName }
+		case 'END_GAME':
 			return { ...gameState, isRunning: false }
 		case 'RESTART_GAME':
 			return { ...gameState, isRunning: true }

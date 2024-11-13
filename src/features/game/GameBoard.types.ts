@@ -3,6 +3,7 @@ export interface GameBoard {
     blocksCountV: number;
     blocksH: number[];
     blocksV: number[];
+    size: number;
 	info?: string;
 }
 
