@@ -95,3 +95,30 @@ g.horizontal-lines {
 .game-actions button {
     float: right;
 }
+
+.menu {
+    margin: auto;
+    max-width: 400px;
+    padding: 16px;
+    background-color: bisque;
+    box-sizing: border-box;
+    font-family: monospace;
+    color: black;
+}
+
+.menu h1 {
+    margin: 0;
+    font-size: 2em;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-family: 'Open Sans', Arial, sans-serif;
+}
+
+.menu strong {
+    color: rgb(112, 76, 182);
+    font-size: 1.2rem;
+    letter-spacing: 1.2px;
+    background-color: rgb(171 138 109 / 17%);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+}

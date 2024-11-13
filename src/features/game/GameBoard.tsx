@@ -21,7 +21,7 @@ import GridGameboard from './GameBoard/GridGameboard';
 const calculateGaps = (blocksCountV: number, blocksCountH: number, size: number) => {
     const width = blocksCountH * size;
     const height = blocksCountV * size;
-    
+
     return {
         vGap: Math.ceil(width / blocksCountV),
         hGap : Math.ceil(height / blocksCountH),
@@ -125,16 +125,15 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
     const height = blocksCountV * size
 
     return (
-        <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
-            tabIndex={0}
-        >
+        <>
+            {/* todo: extract menu to component */}
             <div className='menu'>
                 <h1>{activeGame}</h1>
                 <select onChange={(e) => dispatch({ type: 'SET_GAME', payload: e.target.value })}>
                     {Object.keys(gameBoards).map((game) => <option key={game} value={game}>{game}</option>)}
                 </select>
                 <div className='game-actions'>
-                    <strong>High score:</strong> {score}
+                    <strong>High score:{score}</strong> 
 
                     <button onClick={() => handleSaveGame()}>Save game</button>
                     <button style={{marginRight: 10}} onClick={() => handleLoadGame()}>Load game</button> <br />
@@ -145,29 +144,31 @@ const GameBoard = ({ gameName }: GameBoardProps) => {
                     </div>
                     
                 </div>
-
-
             </div>
-            {statusMessage && <h3>{statusMessage}</h3>}
-            {/**
-             * Part 1. Add the ability to save and load the game
-             * Part 2. Add the ability to play the game on network
-             * Part 3. Add the ability to play the game with AI, train a model to play the game versus human
-             * Part 4. Add the ability to play the game with friends by loading another game on the same screen
-             */}
-            <SnakeGame 
-                vGap={vGap} 
-                hGap={hGap} 
-                blocksCount={blocksCountV} 
-                endGame={handleEndGame} 
-                isRunning={isRunning} 
-                score={score} 
-                setScore={handleSetScore} 
-                ref={gameRef}
+            <div style={{ height, width }} className={`game-wrapper ${gameName.toLowerCase()}`}
+                tabIndex={0}
             >
-                <GridGameboard blocksH={blocksH} blocksV={blocksV} vGap={vGap} hGap={hGap} size={size} />
-            </SnakeGame>
-        </div>
+                {statusMessage && <h3>{statusMessage}</h3>}
+                {/**
+                 * Part 1. Add the ability to save and load the game
+                 * Part 2. Add the ability to play the game on network
+                 * Part 3. Add the ability to play the game with AI, train a model to play the game versus human
+                 * Part 4. Add the ability to play the game with friends by loading another game on the same screen
+                 */}
+                <SnakeGame 
+                    vGap={vGap} 
+                    hGap={hGap} 
+                    blocksCount={blocksCountV} 
+                    endGame={handleEndGame} 
+                    isRunning={isRunning} 
+                    score={score} 
+                    setScore={handleSetScore} 
+                    ref={gameRef}
+                >
+                    <GridGameboard blocksH={blocksH} blocksV={blocksV} vGap={vGap} hGap={hGap} size={size} />
+                </SnakeGame>
+            </div>
+        </>
     );   
 }
 
