@@ -435,7 +435,7 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
                     y={block.y} 
                     width={vGap}
                     height={hGap}
-                    rx="2"
+                    rx="6"
                     className={turnStyle}
                     key={`food-eaten-${i}`}
                     >

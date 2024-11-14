@@ -32,7 +32,8 @@ export type GameRef = {
 export interface GameProps {
     isRunning: boolean;
     blocksCount: number;
-    vGap: number;
+    blockSize?: number;
+    vGap: number; // remove these from everywhere except grid
     hGap: number;
     setScore: (score: number) => void;
     children?: React.ReactNode;

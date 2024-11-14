@@ -116,6 +116,7 @@ const GameBoard = () => {
 
                     {activeGame === 'tetris' &&
                         <Tetris
+                            blockSize={size}
                             vGap={vGap} 
                             hGap={hGap} 
                             blocksCount={blocksCountV}
