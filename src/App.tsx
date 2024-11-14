@@ -3,14 +3,14 @@ import React from 'react';
 import { Counter } from './features/counter/Counter';
 import Draggable from './features/draggable/Draggable';
 import './App.css';
-import GameBoard from './features/game/GameBoard';
-import { GamesProvider } from './features/game/GameBoard.data';
+import GameBoard from './features/game/GameBoard/GameBoard';
+import { GamesProvider } from './features/game/GameBoard/GameBoard.data';
 
 function App() {
   return (
     <div className="App">
       <GamesProvider>
-        <GameBoard gameName='snake' />
+        <GameBoard />
       </GamesProvider>      
     </div>
   );

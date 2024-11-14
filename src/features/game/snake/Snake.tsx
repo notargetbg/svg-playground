@@ -1,10 +1,11 @@
-import React, { useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useImperativeHandle } from 'react';
 import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { randomIntFromInterval, useInterval } from '../../../app/utils';
-import { useEffectCustom } from '../../../hooks/customUseEffect';
-import { updateGameField, useGamesDispatch } from '../GameBoard.data';
+import { updateGameField, useGamesDispatch } from '../GameBoard/GameBoard.data';
+import SnakeFood from './SnakeFood';
+import { GameProps } from '../GameBoard/GameBoard.types';
 
 /* 
     Game is working! Wohoo
@@ -55,23 +56,12 @@ const getInitialPlayerPosition = (blocksCount: number, vGap: number, hGap: numbe
 };
 
 const initialDelay: number = 500;
-interface SnakeGameProps {
-    isRunning: boolean;
-    blocksCount: number;
-    vGap: number;
-    hGap: number;
-    endGame: () => void;
-    setScore: (score: number) => void;
-    children: React.ReactNode;
-    score: number;
-}
 
-const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGame, setScore, children, score }: SnakeGameProps, ref) => {
+const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setScore, children, score }: GameProps, ref) => {
     const initialPlayerPosition = getInitialPlayerPosition(blocksCount, vGap, hGap);
     const baseScore = 50;
     const difficulty = 1;
     const playerColor = '#473dbd';
-    const foodColor = 'red';
     const [delay, setDelay] = useState(initialDelay);
     const [playerPosition, setPosition] = useState<{
         x: number;
@@ -88,8 +78,7 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
     const dispatch = useGamesDispatch();
 
     // useEffectCustom();
-
-    const domRef = useRef(null);
+    
     const resetGame = useCallback(() => {
         setPosition(initialPlayerPosition);
         const randomPosition = getRandPosition(blocksCount, vGap, hGap);
@@ -114,32 +103,113 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
         // todo - add loading spinner
         setTimeout(() => {
             console.log('game loaded!');
-            dispatch(updateGameField('statusMessage', 'SNAKE'));
+            dispatch(updateGameField('statusMessage', 'Game Loaded!'));
 
             const savedGame = localStorage.getItem('snake-game');
-                if (!savedGame) {
-                    console.log('no saved game')
-                    return;
-                }
+            if (!savedGame) {
+                console.log('no saved game')
+                return;
+            }
 
-                const { playerPosition, snakeFood, delay, score} = JSON.parse(savedGame);
+            const { playerPosition, snakeFood, delay, score} = JSON.parse(savedGame);
 
-                setPosition(playerPosition);
-                setSnakeFood(snakeFood);
-                setDelay(delay);
-                setScore(score);
+            setPosition(playerPosition);
+            setSnakeFood(snakeFood);
+            setDelay(delay);
+            setScore(score);
         }, 2000);
 
-    }, [dispatch]);
+    }, [dispatch, setScore, setDelay, setPosition, setSnakeFood]);
+
+    const doTurn = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
+        if (!isRunning) {
+            console.log('game ended!')
+            return;
+        }
+
+        console.log(e)
+
+        if (e.key.toLowerCase() === 'a' || e.keyCode === 37) {
+            const outOfBounds = playerPosition.x === 0;
+            // const goingBackwards = direction rigth minus 1 block
+
+            
+            if (outOfBounds || playerPosition.direction === 'right') return;
+
+            setPosition({
+                ...playerPosition,
+                // x: playerPosition.x - hGap,
+                direction: 'left',
+                stepCount: 0,
+                turns: [...playerPosition.turns, {
+                    x: playerPosition.x,
+                    y: playerPosition.y,
+                    direction: `${playerPosition.direction}-left`
+                }]
+            });
+        }
+
+        if (e.key.toLowerCase() === 'd' || e.keyCode === 39) {
+            const outOfBounds = (playerPosition.x >= (blocksCount * hGap) - hGap);
+            if (outOfBounds || playerPosition.direction === 'left') return;
+
+            setPosition({
+                ...playerPosition,
+                // x: playerPosition.x + hGap,
+                direction: 'right',
+                stepCount: 0,
+                turns: [...playerPosition.turns, {
+                    x: playerPosition.x,
+                    y: playerPosition.y,
+                    direction: `${playerPosition.direction}-right`
+                }]
+            });
+        }
+
+        if (e.key.toLowerCase() === 'w' || e.keyCode === 38) {
+            const outOfBounds = playerPosition.y === 0;
+            if (outOfBounds || playerPosition.direction === 'bottom') return;
+
+            setPosition({
+                ...playerPosition,
+                // y: playerPosition.y - vGap,
+                direction: 'top',
+                stepCount: 0,
+                turns: [...playerPosition.turns, {
+                    x: playerPosition.x,
+                    y: playerPosition.y,
+                    direction: `${playerPosition.direction}-top`
+                }]
+            });
+        }
+
+        if (e.key.toLowerCase() === 's' || e.keyCode === 40) {
+            const outOfBounds = (playerPosition.y >= (blocksCount * vGap) - vGap);
+            if (outOfBounds || playerPosition.direction === 'top') return;
+
+            setPosition({
+                ...playerPosition,
+                // y: playerPosition.y + vGap,
+                direction: 'bottom',
+                stepCount: 0,
+                turns: [...playerPosition.turns, {
+                    x: playerPosition.x,
+                    y: playerPosition.y,
+                    direction: `${playerPosition.direction}-bottom`
+                }]
+            });
+        }
+
+    }, [blocksCount, isRunning, playerPosition, vGap, hGap]);
 
     useImperativeHandle(ref, () => {
         return {
-            domRef,
             resetGame,
             loadGame,
-            getGameState
+            getGameState,
+            onKeyPress: doTurn
         };
-      }, [resetGame, getGameState, loadGame]);
+      }, [resetGame, getGameState, loadGame, doTurn]);
 
     const isSnakeEating = snakeFood && (snakeFood.x === playerPosition.x &&
         snakeFood.y === playerPosition.y);
@@ -205,13 +275,17 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
             setSnakeFood({ x, y });
         }
         
-    }, [isSnakeEating, playerPosition, createFoodOutsideSnake, vGap, hGap]);
+    }, [isSnakeEating, playerPosition, createFoodOutsideSnake, vGap, hGap, setScore, setDelay, delay, score]);
+
+    const endGame = () => {
+        dispatch({ type: 'END_GAME' });
+    };
 
     // useInterval(() => {
     //     const { x, y } =  createFoodOutsideSnake(playerPosition, vGap, hGap);
         
     //     setSnakeFood({ x, y });
-    // }, isRunning ? 13500 : null);
+    // }, isRunning ? 13500 : null);    
 
     // main game loop
     useInterval(() => {
@@ -321,152 +395,57 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, endGam
 
     }, delay);
 
-    const doTurn = () => (e: React.KeyboardEvent<SVGSVGElement>) => {
-        if (!isRunning) {
-            console.log('game ended!')
-            return;
-        }
-
-        console.log(e)
-
-        if (e.key.toLowerCase() === 'a' || e.keyCode === 37) {
-            const outOfBounds = playerPosition.x === 0;
-            // const goingBackwards = direction rigth minus 1 block
-
-            
-            if (outOfBounds || playerPosition.direction === 'right') return;
-
-            setPosition({
-                ...playerPosition,
-                // x: playerPosition.x - hGap,
-                direction: 'left',
-                stepCount: 0,
-                turns: [...playerPosition.turns, {
-                    x: playerPosition.x,
-                    y: playerPosition.y,
-                    direction: `${playerPosition.direction}-left`
-                }]
-            });
-        }
-
-        if (e.key.toLowerCase() === 'd' || e.keyCode === 39) {
-            const outOfBounds = (playerPosition.x >= (blocksCount * hGap) - hGap);
-            if (outOfBounds || playerPosition.direction === 'left') return;
-
-            setPosition({
-                ...playerPosition,
-                // x: playerPosition.x + hGap,
-                direction: 'right',
-                stepCount: 0,
-                turns: [...playerPosition.turns, {
-                    x: playerPosition.x,
-                    y: playerPosition.y,
-                    direction: `${playerPosition.direction}-right`
-                }]
-            });
-        }
-
-        if (e.key.toLowerCase() === 'w' || e.keyCode === 38) {
-            const outOfBounds = playerPosition.y === 0;
-            if (outOfBounds || playerPosition.direction === 'bottom') return;
-
-            setPosition({
-                ...playerPosition,
-                // y: playerPosition.y - vGap,
-                direction: 'top',
-                stepCount: 0,
-                turns: [...playerPosition.turns, {
-                    x: playerPosition.x,
-                    y: playerPosition.y,
-                    direction: `${playerPosition.direction}-top`
-                }]
-            });
-        }
-
-        if (e.key.toLowerCase() === 's' || e.keyCode === 40) {
-            const outOfBounds = (playerPosition.y >= (blocksCount * vGap) - vGap);
-            if (outOfBounds || playerPosition.direction === 'top') return;
-
-            setPosition({
-                ...playerPosition,
-                // y: playerPosition.y + vGap,
-                direction: 'bottom',
-                stepCount: 0,
-                turns: [...playerPosition.turns, {
-                    x: playerPosition.x,
-                    y: playerPosition.y,
-                    direction: `${playerPosition.direction}-bottom`
-                }]
-            });
-        }
-
-    };
-
     return (
-            <svg tabIndex={0} onKeyDown={doTurn()} ref={domRef}>
-                {children}
-                <g className='mark-turn'>
-                    {/* {playerPosition.turns.map(turn => {
-                        return (
-                            <rect
-                                fill={playerColor}
-                                x={turn.x}
-                                y={turn.y} 
-                                width={vGap}
-                                height={hGap}
-                                rx="2"
-                            >
-                                x
-                            </rect>
-                        );
-                    })} */}
-                </g>
-                <g className='player'>
+    <>
+        <g className='mark-turn'>
+            {/* {playerPosition.turns.map(turn => {
+                return (
                     <rect
                         fill={playerColor}
-                        x={playerPosition.x}
-                        y={playerPosition.y} 
+                        x={turn.x}
+                        y={turn.y} 
                         width={vGap}
                         height={hGap}
                         rx="2"
                     >
                         x
                     </rect>
-                    {playerPosition.foodBlocksEaten.map((block, i) => {
-                        const turnsMatch = playerPosition.turns.filter(turn => turn.x === block.x && turn.y === block.y);
-                        const turnStyle = turnsMatch[0] ? `${turnsMatch[0].direction}-turn` : '';
+                );
+            })} */}
+        </g>
+        <g className='player'>
+            <rect
+                fill={playerColor}
+                x={playerPosition.x}
+                y={playerPosition.y} 
+                width={vGap}
+                height={hGap}
+                rx="2"
+            >
+                x
+            </rect>
+            {playerPosition.foodBlocksEaten.map((block, i) => {
+                const turnsMatch = playerPosition.turns.filter(turn => turn.x === block.x && turn.y === block.y);
+                const turnStyle = turnsMatch[0] ? `${turnsMatch[0].direction}-turn` : '';
 
-                        return <rect
-                            fill={playerColor}
-                            opacity={0.6}
-                            x={block.x}
-                            y={block.y} 
-                            width={vGap}
-                            height={hGap}
-                            rx="2"
-                            className={turnStyle}
-                            key={`food-eaten-${i}`}
-                            >
-                            food
-                        </rect>
-                    })}
-                </g>
-                <g className='spawned-block'>
-                    {snakeFood &&
-                        <rect
-                            fill={foodColor}
-                            x={snakeFood.x}
-                            y={snakeFood.y} 
-                            width={vGap}
-                            height={hGap}
-                            rx="2"
-                        >
-                            food
-                        </rect>
-                    }
-                </g>
-            </svg>
-    );   
+                return <rect
+                    fill={playerColor}
+                    opacity={0.6}
+                    x={block.x}
+                    y={block.y} 
+                    width={vGap}
+                    height={hGap}
+                    rx="2"
+                    className={turnStyle}
+                    key={`food-eaten-${i}`}
+                    >
+                    food
+                </rect>
+            })}
+        </g>
+        
+        <SnakeFood width={vGap} height={hGap} snakeFood={snakeFood} />
+    </>);   
 })
 
 export default SnakeGame;

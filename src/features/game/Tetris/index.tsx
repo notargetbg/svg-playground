@@ -12,12 +12,9 @@
  * This is working under svg and can be saved/load from a json file or a database
  */
 
+import { GameProps } from "../GameBoard/GameBoard.types";
 
-
-function Tetris({ children, blocksH, blocksV, vGap, hGap }) {
-
-
-
+function Tetris({ children, isRunning, blocksCount, vGap, hGap, setScore, score }: GameProps) {
 
 	return (
 		<div>

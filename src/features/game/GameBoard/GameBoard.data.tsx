@@ -15,7 +15,7 @@ const initialState: GameState = {
 	activeGame: 'snake',
 	isRunning: false,
 	gameBoards,
-	statusMessage: 'Game Running',
+	statusMessage: 'Go when ready!',
 	score: 0
 }
 
@@ -86,7 +86,7 @@ function gamesReducer(gameState: GameState, action: any ) {
 		case 'SET_GAME':
 			return { ...gameState, activeGame: action.payload }
 		case 'TOGGLE_PAUSE_GAME':
-			return { ...gameState, isRunning: !gameState.isRunning }
+			return { ...gameState, isRunning: !gameState.isRunning, statusMessage: !gameState.isRunning ? 'Game running' : 'PAUSED' } 
 		case 'LOAD_GAME':
 			return { ...gameState, isRunning: false, activeGame: action.payload.gameName }
 		case 'END_GAME':

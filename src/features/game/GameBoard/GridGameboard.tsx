@@ -8,7 +8,7 @@ interface GridGameboardProps {
 
 export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: GridGameboardProps) {
 
-	console.log('GridGameboard', blocksH, blocksV, vGap, hGap, size);	
+	console.log('GridGameboard', blocksH, blocksV, vGap, hGap, size);
 
 	return (
 		<>
