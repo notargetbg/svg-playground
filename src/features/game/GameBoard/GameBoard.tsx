@@ -8,6 +8,8 @@ import GridGameboard from '../GameBoard/GridGameboard';
 import { GameRef } from './GameBoard.types';
 import Menu from './Menu';
 import { defaultKeyboardShortcuts } from './KeyboardBindings';
+import { throttle } from 'lodash';
+import { calculateGaps, THROTTLE_DELAY } from '../../../app/utils';
 
 /* 
     Snek Game is working! Wohoo
@@ -24,16 +26,6 @@ import { defaultKeyboardShortcuts } from './KeyboardBindings';
     - add game over message - in progress
     - add configuration - not started
 */
-
-const calculateGaps = (blocksCountV: number, blocksCountH: number, size: number) => {
-    const width = blocksCountH * size;
-    const height = blocksCountV * size;
-
-    return {
-        vGap: Math.ceil(width / blocksCountV),
-        hGap : Math.ceil(height / blocksCountH),
-    }
-}
 
 // on restart
 // show on screen message
@@ -60,9 +52,11 @@ const GameBoard = () => {
         dispatch(updateGameField('score', score + scoreIncrement));
     }
 
-    const handleKeyDown = useCallback((e: KeyboardEvent<SVGSVGElement>) => {
-        gameRef.current?.onKeyPress(e);
-    }, [gameRef])
+    const throttled = throttle((e: KeyboardEvent<SVGSVGElement>) => {
+        gameRef.current?.onKeyPress(e); 
+    }, THROTTLE_DELAY);
+
+    const handleKeyDown = useCallback(throttled, [throttled])
 
     const width = blocksCountH * size;
     const height = blocksCountV * size

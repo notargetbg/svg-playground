@@ -1,32 +1,13 @@
-import { useEffect } from 'react';
-import { useRef } from 'react';
+export const THROTTLE_DELAY = 500;
 
-type RefCallback = () => void;
+export const calculateGaps = (blocksCountV: number, blocksCountH: number, size: number) => {
+    const width = blocksCountH * size;
+    const height = blocksCountV * size;
 
-export function useInterval(callback: () => void, delay: number) {
-    const savedCallback = useRef<RefCallback | null>();
-  
-    // Remember the latest callback.
-    useEffect(() => {
-      savedCallback.current = callback;
-    }, [callback]);
-  
-    // Set up the interval.
-    useEffect(() => {
-      if (savedCallback.current === null) return;
-
-      console.log('setting interval');      
-
-      function tick() {
-        if (savedCallback.current) {
-          savedCallback.current();
-        } 
-      }
-      if (delay !== null) {
-        let id = setInterval(tick, delay);
-        return () => clearInterval(id);
-      }
-    }, [delay]);
+    return {
+        vGap: Math.ceil(width / blocksCountV),
+        hGap : Math.ceil(height / blocksCountH),
+    }
 }
 
 export function randomIntFromInterval(min: number, max: number) { // min and max included 

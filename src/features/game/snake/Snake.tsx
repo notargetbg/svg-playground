@@ -1,11 +1,12 @@
-import React, { useImperativeHandle } from 'react';
+import React, { useImperativeHandle, useMemo } from 'react';
 import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { randomIntFromInterval, useInterval } from '../../../app/utils';
+import { randomIntFromInterval } from '../../../app/utils';
 import { updateGameField, useGamesDispatch } from '../GameBoard/GameBoard.data';
 import SnakeFood from './SnakeFood';
 import { GameProps } from '../GameBoard/GameBoard.types';
+import { useGameLoop } from '../hooks/useGameLoop';
 
 /* 
     Game is working! Wohoo
@@ -121,13 +122,13 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
 
     }, [dispatch, setScore, setDelay, setPosition, setSnakeFood]);
 
-    const doTurn = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
+    const turnCallback = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
         if (!isRunning) {
-            console.log('game ended!')
+            console.log('game paused!')
             return;
         }
 
-        console.log(e)
+        console.log('doTurn CALLED', e)
 
         if (e.key.toLowerCase() === 'a' || e.keyCode === 37) {
             const outOfBounds = playerPosition.x === 0;
@@ -200,19 +201,22 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
             });
         }
 
-    }, [blocksCount, isRunning, playerPosition, vGap, hGap]);
+    }, [blocksCount, playerPosition, vGap, hGap, isRunning]);
 
     useImperativeHandle(ref, () => {
         return {
             resetGame,
             loadGame,
             getGameState,
-            onKeyPress: doTurn
+            onKeyPress: turnCallback
         };
-      }, [resetGame, getGameState, loadGame, doTurn]);
+      }, [resetGame, getGameState, loadGame, turnCallback]);
 
-    const isSnakeEating = snakeFood && (snakeFood.x === playerPosition.x &&
-        snakeFood.y === playerPosition.y);
+    const isSnakeEating = useMemo(() => snakeFood && 
+        (snakeFood.x === playerPosition.x &&
+        snakeFood.y === playerPosition.y), 
+        [snakeFood, playerPosition]
+    );
 
     // compare in different way look at x and y same time for each position!
     const createFoodOutsideSnake = useCallback((pPos: playerPosition, vg: number, hg: number) => {
@@ -277,9 +281,9 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
         
     }, [isSnakeEating, playerPosition, createFoodOutsideSnake, vGap, hGap, setScore, setDelay, delay, score]);
 
-    const endGame = () => {
+    const endGame = useCallback(() => {
         dispatch({ type: 'END_GAME' });
-    };
+    }, [dispatch]);
 
     // useInterval(() => {
     //     const { x, y } =  createFoodOutsideSnake(playerPosition, vGap, hGap);
@@ -288,14 +292,10 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
     // }, isRunning ? 13500 : null);    
 
     // main game loop
-    useInterval(() => {
+    const loopStep = () => {
         const stepCount = playerPosition.foodBlocksEaten.length >= playerPosition.stepCount ?
             playerPosition.stepCount + 1 :
             playerPosition.stepCount;
-
-        if (!isRunning) {
-            return;
-        }
 
         let newPosition = {
             ...playerPosition,
@@ -393,7 +393,9 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
             }),
         });
 
-    }, delay);
+    };
+
+    useGameLoop(loopStep, delay); 
 
     return (
     <>
