@@ -11,7 +11,7 @@
  * This is working under svg and can be saved/load from a json file or a database
  */
 
-import { useImperativeHandle, forwardRef, useState, useEffect, useCallback } from "react";
+import { useImperativeHandle, forwardRef, useState, useCallback } from "react";
 import { GameProps } from "../GameBoard/GameBoard.types";
 import Block from "./Block";
 import TetrisBlocks from "./Blocks.data";
@@ -52,8 +52,8 @@ const Tetris = forwardRef(({ children, isRunning, blocksCount, vGap, hGap, setSc
 
 	console.log(blocksCountH, blocksCountV, blocksH, blocksV);
 
-	const leftBound = 0;
-	const rightBound = blocksCountH * blockSize;
+	// const leftBound = 0;
+	// const rightBound = blocksCountH * blockSize;
 	const bottomBound = blocksCountV * blockSize;
 
 	const moveBlock = useCallback((direction: string) => {
@@ -88,7 +88,7 @@ const Tetris = forwardRef(({ children, isRunning, blocksCount, vGap, hGap, setSc
 
 		moveBlock('down');
 
-	}, [moveBlock, activeBlock, bottomBound, blockSize, setLockedBlocks]);
+	}, [moveBlock, activeBlock, bottomBound, blockSize, lockedBlocks, setLockedBlocks]);
 
 	useGameLoop(loopStep, 2000);
 

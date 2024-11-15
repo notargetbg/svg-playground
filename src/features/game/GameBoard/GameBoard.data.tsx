@@ -88,10 +88,6 @@ export function updateGameField(field: string, value: any) {
 }
 
 function gamesReducer(gameState: GameState, action: any ) {
-
-	// console.log('GAMES REDUCER ACTION', action);
-	// console.log('GAMES REDUCER STATE', gameState);
-
 	switch (action.type) {
 
 		// when choosing a game, we set active game string key
@@ -106,7 +102,6 @@ function gamesReducer(gameState: GameState, action: any ) {
 		case 'RESTART_GAME':
 			return { ...gameState, isRunning: true }
 		case 'UPDATE_GAME_FIELD': {
-			console.log('UPDATE_GAME_FIELD', action);
 			return { ...gameState, [action.payload.field]: action.payload.value }
 		}
 

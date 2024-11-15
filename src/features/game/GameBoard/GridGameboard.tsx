@@ -8,8 +8,6 @@ interface GridGameboardProps {
 }
 
 export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: GridGameboardProps) {
-	console.log('GridGameboard', blocksH, blocksV, vGap, hGap, size);
-
 	return (
 		<>
 			<g className='horizontal-lines'>

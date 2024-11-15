@@ -6,10 +6,10 @@ import Tetris from '../Tetris';
 import { updateGameField, useGamesDispatch, useGamesState } from './GameBoard.data';
 import GridGameboard from '../GameBoard/GridGameboard';
 import { GameRef } from './GameBoard.types';
-import Menu from './Menu';
 import { defaultKeyboardShortcuts } from './KeyboardBindings';
 import { throttle } from 'lodash';
 import { calculateGaps, THROTTLE_DELAY } from '../../../app/utils';
+import Menu from './Menu/Menu';
 
 /* 
     Snek Game is working! Wohoo
@@ -60,9 +60,6 @@ const GameBoard = () => {
 
     const width = blocksCountH * size;
     const height = blocksCountV * size
-
-    console.log("RENDERING GAME BOARD");
-    console.log(Object.entries(defaultKeyboardShortcuts))
 
     return (
         <>

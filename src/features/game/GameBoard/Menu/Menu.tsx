@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { updateGameField, useGamesDispatch, useGamesState } from "./GameBoard.data";
-import { GameRef } from "./GameBoard.types";
+import { updateGameField, useGamesDispatch, useGamesState } from "../GameBoard.data";
+import { GameRef } from "../GameBoard.types";
  /*** 
 	* Game menu
 	* Main menu: Options, Start game, Leaderboard, Quit
@@ -51,7 +51,7 @@ function Menu({ gameRef, domRef }: MenuProps) {
         } catch (error) {
             console.log(error);
         }
-    }, [dispatch, domRef, gameRef, activeGame]);
+    }, [dispatch, domRef, gameRef]);
     
     const handleSaveGame = useCallback(() => {
         if (!gameRef.current) return;
@@ -232,7 +232,7 @@ function Menu({ gameRef, domRef }: MenuProps) {
 		<nav className="menu">
 			{statusMessage && <h3>{statusMessage}</h3>}
 			<select onChange={chooseGame} defaultValue={activeGame}>
-				{Object.keys(gameBoards).map((game) => <option key={game} value={game} selected={game === activeGame} >{game}</option>)}
+				{Object.keys(gameBoards).map((game) => <option key={game} value={game} >{game}</option>)}
 			</select>
 			<div className='game-actions'>
 				<strong>High score:{score}</strong>
@@ -251,13 +251,6 @@ function Menu({ gameRef, domRef }: MenuProps) {
 					</div>
 				</div>
 				)}
-
-				{/* <button onClick={() => handleSaveGame()}>Save game</button>
-				<button style={{marginRight: 10}} onClick={() => handleLoadGame()}>Load game</button> <br />
-				<div style={{marginTop: 4}}>
-					<button onClick={() => handleTogglePauseGame()}>{isRunning ? 'Pause' : 'Resume'}</button>
-					<button style={{marginRight: 10}} onClick={() => handleRestartGame()}>Restart game</button> <br />
-				</div> */}
 			</div>
 		</nav>
 	);
