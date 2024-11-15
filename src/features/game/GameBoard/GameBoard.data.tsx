@@ -10,16 +10,28 @@ const gameBoards: GameBoards = {
     tetris: getBoardByCountVH(20, 10, 20),
 }
 
-// Initial game state
 const initialState: GameState = {
 	activeGame: 'snake',
 	isRunning: false,
 	gameBoards,
 	statusMessage: 'Go when ready!',
 	score: 0
+};
+
+// Try to populate initial game state from ls
+const getIntialState = (): GameState => {
+	try {
+		return {
+			...initialState,
+			activeGame: localStorage.getItem('game-last-played') || 'snake',
+		}
+	} catch (error) {
+		console.error('Error getting activeGame from LS', error);
+		return initialState
+	}
 }
 
-export const GamesContext = createContext<GameState>(initialState);
+export const GamesContext = createContext<GameState>(getIntialState());
 export const GamesDispatchContext = createContext<Dispatch<any>>(() => {});
 
 function getBoardByCountVH(blocksCountV: number, blocksCountH: number, size: number) {
@@ -37,7 +49,7 @@ interface GamesProviderProps {
 }
 
 export function GamesProvider({ children }: GamesProviderProps) {
-	const [gameBoard, dispatch] = useReducer(gamesReducer, initialState);
+	const [gameBoard, dispatch] = useReducer(gamesReducer, getIntialState());
 
 	return (
 		<GamesContext.Provider value={gameBoard}>

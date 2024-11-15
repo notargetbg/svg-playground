@@ -106,7 +106,9 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
             console.log('game loaded!');
             dispatch(updateGameField('statusMessage', 'Game Loaded!'));
 
-            const savedGame = localStorage.getItem('snake-game');
+            const lastPlayedGame = localStorage.getItem('game-last-played');
+            const savedGame = localStorage.getItem(lastPlayedGame || 'snake');
+            
             if (!savedGame) {
                 console.log('no saved game')
                 return;
@@ -133,7 +135,6 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
         if (e.key.toLowerCase() === 'a' || e.keyCode === 37) {
             const outOfBounds = playerPosition.x === 0;
             // const goingBackwards = direction rigth minus 1 block
-
             
             if (outOfBounds || playerPosition.direction === 'right') return;
 

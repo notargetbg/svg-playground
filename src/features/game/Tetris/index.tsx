@@ -96,7 +96,7 @@ const Tetris = forwardRef(({ children, isRunning, blocksCount, vGap, hGap, setSc
         return {
             resetGame: () => { console.log('reset game') },
             loadGame: () => { console.log('load game') },
-            getGameState: { score, isRunning, foo: 'bar' },
+            getGameState: () => ({ score, isRunning, foo: 'bar' }),
             onKeyPress: (e: React.KeyboardEvent) => {
 				console.log(e.key);
 				if (e.key === 'ArrowLeft' || e.key === 'a') {

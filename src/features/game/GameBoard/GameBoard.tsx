@@ -62,7 +62,6 @@ const GameBoard = () => {
     const height = blocksCountV * size
 
     console.log("RENDERING GAME BOARD");
-
     console.log(Object.entries(defaultKeyboardShortcuts))
 
     return (
@@ -89,9 +88,9 @@ const GameBoard = () => {
                 tabIndex={0}
             >
                 {/**
-                 * Part 1. Add the ability to save and load the game
-                 * Part 2. Add the ability to play the game on network
-                 * Part 3. Add the ability to play the game with AI, train a model to play the game versus human
+                 * Part 1. Add the ability to save and load the game - done
+                 * Part 2. Add the ability to play the game with AI, train a model to play the game versus human
+                 * Part 3. Add the ability to play the game on network
                  * Part 4. Add the ability to play the game with friends by loading another game on the same screen
                  */}
 

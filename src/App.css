@@ -147,3 +147,7 @@ g.horizontal-lines {
     font-family: monospace;
     margin-bottom: 4px;
 }
+
+rect {
+    transition: all .1s linear;
+}

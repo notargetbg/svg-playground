@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 interface GridGameboardProps {
 	blocksH: number[];
 	blocksV: number[];
@@ -7,7 +8,6 @@ interface GridGameboardProps {
 }
 
 export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: GridGameboardProps) {
-
 	console.log('GridGameboard', blocksH, blocksV, vGap, hGap, size);
 
 	return (
@@ -18,7 +18,7 @@ export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: Gr
 
 				const extraLine = i === blocksH.length - 1 ? (
 					<line
-						key={`item-${blocksH.length}`}
+						key={`extra-line-${i}`}
 						stroke='#274dc9'
 						// stroke-width="1"
 						x1={(size * i) + size}
@@ -28,11 +28,10 @@ export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: Gr
 					/>
 				) : null;
 
-				return <>
+				return <Fragment key={`item-h-fragment-${i}`}>
 					{extraLine}
 					<line
-
-						key={`item-${i}`}
+						key={`line-${i}`}
 						stroke='#274dc9'
 						// stroke-width="1"
 						x1={(size * i)}
@@ -40,16 +39,15 @@ export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: Gr
 						y1={0}
 						y2='100%'
 					/>
-				</>				
+				</Fragment>
 			})}
 			</g>
 
 			<g className='vertical-lines'>
 			{blocksV.map((block, i) => {
-
 				const extraLine = i === blocksV.length - 1 ? (
 					<line
-						key={`item-${blocksV.length}`}
+						key={`extra-line-${i}`}
 						stroke='#274dc9'
 						// stroke-width="1"
 						x1={0}
@@ -59,10 +57,10 @@ export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: Gr
 					/>
 				) : null;
 
-				return <>
+				return <Fragment key={`item-v-fragment-${i}`}>
 					{extraLine}
 					<line 
-						key={`item-${i}`}
+						key={`line-${i}`}
 						stroke='#274dc9'
 						// stroke-width="1"
 						x1={0}
@@ -70,7 +68,7 @@ export default function GridGameboard({ blocksH, blocksV, vGap, hGap, size }: Gr
 						y1={(size * i)}
 						y2={(size * i)}
 					/>
-				</>
+				</Fragment>
 			})}
 			</g>
 		</>

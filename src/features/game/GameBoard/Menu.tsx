@@ -66,12 +66,14 @@ function Menu({ gameRef, domRef }: MenuProps) {
 
         dispatch({ type: 'SAVE_GAME', payload: { gameName: activeGame, score } });
 
-        localStorage.setItem('snake-game', JSON.stringify({
+        localStorage.setItem(activeGame, JSON.stringify({
             playerPosition,
             snakeFood,
             delay,
-            score
-        }));     
+            score,
+        }));
+
+		localStorage.setItem('game-last-played', activeGame);
 
     }, [score, activeGame, dispatch, gameRef]);
 
@@ -221,11 +223,16 @@ function Menu({ gameRef, domRef }: MenuProps) {
 		}
 	}, [handleKeyPress]);
 
+	const chooseGame = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+		localStorage.setItem('game-last-played', e.target.value);
+		dispatch({ type: 'SET_GAME', payload: e.target.value });
+	}, [dispatch]);
+
 	return (
 		<nav className="menu">
 			{statusMessage && <h3>{statusMessage}</h3>}
-			<select onChange={(e) => dispatch({ type: 'SET_GAME', payload: e.target.value })}>
-				{Object.keys(gameBoards).map((game) => <option key={game} value={game}>{game}</option>)}
+			<select onChange={chooseGame} defaultValue={activeGame}>
+				{Object.keys(gameBoards).map((game) => <option key={game} value={game} selected={game === activeGame} >{game}</option>)}
 			</select>
 			<div className='game-actions'>
 				<strong>High score:{score}</strong>
