@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { updateGameField, useGamesDispatch, useGamesState } from "../GameBoard.data";
 import { GameRef } from "../GameBoard.types";
+import { useGameRef } from "../../hooks/useGameRef";
  /*** 
 	* Game menu
 	* Main menu: Options, Start game, Leaderboard, Quit
@@ -18,16 +19,16 @@ import { GameRef } from "../GameBoard.types";
 let restartTimeout: NodeJS.Timeout | null = null;
 
 interface MenuProps {
-	gameRef: React.RefObject<GameRef>;
 	domRef: React.RefObject<SVGSVGElement>;
 }
 
 type MenuDefinition = 'mainMenu' | 'options' | 'leaderboard' | 'closed';
 
-function Menu({ gameRef, domRef }: MenuProps) {
+function Menu({ domRef }: MenuProps) {
 	const [activeMenu, setActiveMenu] = useState<MenuDefinition>('closed');
-	const { gameBoards, activeGame, isRunning, score, statusMessage } = useGamesState();
+	const { gameBoards, activeGame, isRunning, score, statusMessage, iteration } = useGamesState();
 	const dispatch = useGamesDispatch();
+	const { gameRef } = useGameRef();
 
 	const handleRestartGame = useCallback(() => {
 		
@@ -35,15 +36,17 @@ function Menu({ gameRef, domRef }: MenuProps) {
         try {
             if (!gameRef.current) return;
 
+			console.log('RESTARTING GAME ...');
             gameRef.current.resetGame();
             dispatch(updateGameField('score', 0));
-            restartTimeout = setTimeout(() => {
-                dispatch(updateGameField('statusMessage', 'GET READY ...'));
-            }, 0);
-            restartTimeout = setTimeout(() => {
-                dispatch(updateGameField('statusMessage', 'HUNT!'));
-                dispatch({ type: 'TOGGLE_PAUSE_GAME' });
-            }, 1500);
+			dispatch(updateGameField('iteration', 0));
+            // restartTimeout = setTimeout(() => {
+            //     dispatch(updateGameField('statusMessage', 'GET READY ...'));
+            // }, 0);
+            // restartTimeout = setTimeout(() => {
+            //     dispatch(updateGameField('statusMessage', 'HUNT!'));
+            //     dispatch({ type: 'TOGGLE_PAUSE_GAME' });
+            // }, 1500);
 
             if (domRef.current) {
                 domRef.current.focus()
@@ -230,12 +233,12 @@ function Menu({ gameRef, domRef }: MenuProps) {
 
 	return (
 		<nav className="menu">
-			{statusMessage && <h3>{statusMessage}</h3>}
+			{statusMessage && <h3>{statusMessage} <small>iteration {iteration}</small></h3>}
 			<select onChange={chooseGame} defaultValue={activeGame}>
 				{Object.keys(gameBoards).map((game) => <option key={game} value={game} >{game}</option>)}
 			</select>
 			<div className='game-actions'>
-				<strong>High score:{score}</strong>
+				<strong>High score: <span>{score}</span></strong>
 
 				{activeMenu !== 'closed' && (
 				<div>

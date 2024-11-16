@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useRef } from 'react';
-import { useGamesState } from "../GameBoard/GameBoard.data";
+import { useGamesDispatch, useGamesState } from "../GameBoard/GameBoard.data";
 
 type RefCallback = () => void;
 let id: NodeJS.Timeout;
 
 export function useGameLoop(callback: VoidFunction, delayMs: number = 1000) {
-	const { isRunning } = useGamesState();
+	const { isRunning, iteration } = useGamesState();
+	const dispatch = useGamesDispatch();
 
 	const savedCallback = useRef<RefCallback | null>();
   
@@ -21,6 +22,7 @@ export function useGameLoop(callback: VoidFunction, delayMs: number = 1000) {
 
 		function tick() {
 			if (savedCallback.current && isRunning) {
+				dispatch({ type: 'UPDATE_GAME_FIELD', payload: { field: 'iteration', value: iteration + 1 } });
 				savedCallback.current();
 			} 
 		}
@@ -30,5 +32,5 @@ export function useGameLoop(callback: VoidFunction, delayMs: number = 1000) {
 			return () => clearInterval(id);
 		}
 
-    }, [delayMs, isRunning]);
+    }, [delayMs, isRunning, iteration, dispatch]);
 }

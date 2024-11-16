@@ -1,0 +1,12 @@
+.prompt-wrapper {
+	position: fixed;
+    top: 50%;
+    left: 50%;
+    right: 0;
+    bottom: 0;
+    transform: translate(-50%, -50%);
+    background: #ffdcc3;
+    padding: 50px;
+    border-radius: 3px;
+    box-shadow: 0 0 115px 20px #5e5e5e52;
+}

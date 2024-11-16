@@ -7,9 +7,12 @@ import { updateGameField, useGamesDispatch, useGamesState } from './GameBoard.da
 import GridGameboard from '../GameBoard/GridGameboard';
 import { GameRef } from './GameBoard.types';
 import { defaultKeyboardShortcuts } from './KeyboardBindings';
-import { throttle } from 'lodash';
+import { set, throttle } from 'lodash';
 import { calculateGaps, THROTTLE_DELAY } from '../../../app/utils';
 import Menu from './Menu/Menu';
+import { useGameRef } from '../hooks/useGameRef';
+import Prompt from '../PlayerPrompt/Prompt';
+import EndGameScreen from '../PlayerPrompt/EndGameScreen';
 
 /* 
     Snek Game is working! Wohoo
@@ -36,6 +39,7 @@ const GameBoard = () => {
     const { gameBoards, activeGame, isRunning, score } = useGamesState();
     const domRef = useRef<SVGSVGElement>(null);
     const gameRef = useRef<GameRef>(null);
+    const { setGameRef }= useGameRef();
     const dispatch = useGamesDispatch();
     
     // todo: make dynamic and animate snake movement smoothly
@@ -47,6 +51,12 @@ const GameBoard = () => {
             domRef.current.focus()
         }
     }, []);
+
+    useEffect(() => {
+        if (gameRef.current) {
+            setGameRef(gameRef.current);
+        }
+    }, [gameRef, setGameRef]);
 
     const handleSetScore = (scoreIncrement: number) => {
         dispatch(updateGameField('score', score + scoreIncrement));
@@ -64,7 +74,7 @@ const GameBoard = () => {
     return (
         <>
             <h1 className='game-title'>{activeGame}</h1>      
-            <Menu gameRef={gameRef} domRef={domRef} />
+            <Menu domRef={domRef} />
             {/* sidebar showing key bindings */}
             <aside className='sidebar'>
                 <h2>Key Bindings</h2>
@@ -119,6 +129,9 @@ const GameBoard = () => {
                     <GridGameboard blocksH={blocksH} blocksV={blocksV} vGap={vGap} hGap={hGap} size={size} />
                 </svg>                
             </div>
+            <Prompt>
+                <EndGameScreen />
+            </Prompt>
         </>
     );   
 }

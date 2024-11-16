@@ -15,7 +15,8 @@ const initialState: GameState = {
 	isRunning: false,
 	gameBoards,
 	statusMessage: 'Go when ready!',
-	score: 0
+	score: 0,
+	iteration: 0,
 };
 
 // Try to populate initial game state from ls
@@ -98,7 +99,7 @@ function gamesReducer(gameState: GameState, action: any ) {
 		case 'LOAD_GAME':
 			return { ...gameState, isRunning: false, activeGame: action.payload.gameName }
 		case 'END_GAME':
-			return { ...gameState, isRunning: false }
+			return { ...gameState, isRunning: false, gameState: 'Game Over!' }
 		case 'RESTART_GAME':
 			return { ...gameState, isRunning: true }
 		case 'UPDATE_GAME_FIELD': {

@@ -284,6 +284,9 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
 
     const endGame = useCallback(() => {
         dispatch({ type: 'END_GAME' });
+        // open modal with simple nice looking game over screen
+        // save score to leaderboard with name input
+        // call reset game after 5 seconds
     }, [dispatch]);
 
     // useInterval(() => {

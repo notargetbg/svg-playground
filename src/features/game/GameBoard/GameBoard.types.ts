@@ -17,6 +17,7 @@ export interface GameState {
 	gameBoards: GameBoards;
     score: number;
     statusMessage: string;
+    iteration: number;
 }
 
 export type GameRef = { 
