@@ -5,17 +5,17 @@
 import { useReducer } from "react";
 import { Action } from "redux";
 
-const initialState = {
-	show: false
-};
+const initialState = false;
 
 function usePromptReducer() {
 	return useReducer((state = initialState, action: Action) => {
 		switch (action.type) {
-			case 'SHOW':
+			case 'SHOW': {
 				return true;
-			case 'HIDE':
+			}				
+			case 'HIDE': {
 				return false;
+			}
 			default:
 				return state;
 		}
@@ -23,5 +23,6 @@ function usePromptReducer() {
 }
 
 export default usePromptReducer;
+
 
 

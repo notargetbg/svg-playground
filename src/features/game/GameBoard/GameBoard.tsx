@@ -7,7 +7,7 @@ import { updateGameField, useGamesDispatch, useGamesState } from './GameBoard.da
 import GridGameboard from '../GameBoard/GridGameboard';
 import { GameRef } from './GameBoard.types';
 import { defaultKeyboardShortcuts } from './KeyboardBindings';
-import { set, throttle } from 'lodash';
+import { throttle } from 'lodash';
 import { calculateGaps, THROTTLE_DELAY } from '../../../app/utils';
 import Menu from './Menu/Menu';
 import { useGameRef } from '../hooks/useGameRef';
@@ -67,7 +67,6 @@ const GameBoard = () => {
     }, THROTTLE_DELAY);
 
     const handleKeyDown = useCallback(throttled, [throttled])
-
     const width = blocksCountH * size;
     const height = blocksCountV * size
 

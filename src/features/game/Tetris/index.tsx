@@ -17,6 +17,7 @@ import Block from "./Block";
 import TetrisBlocks from "./Blocks.data";
 import { useGamesState } from "../GameBoard/GameBoard.data";
 import { useGameLoop } from "../hooks/useGameLoop";
+// import usePromptReducer from "../hooks/usePromptReducer";
 
 function drawTetrisBlock(name: string, size: number, color: string, blockXPos: number, blockYPos: number) {
 	const block = TetrisBlocks.find(block => block.name ===  name);
@@ -44,6 +45,10 @@ const Tetris = forwardRef(({ children, isRunning, blocksCount, vGap, hGap, setSc
 		'x': 0,
 		'y': 0,
 	}); // one of the TetrisBlocks 
+
+	// const [ show ] = usePromptReducer()
+
+	// console.log('show', show);
 
 	const [lockedBlocks, setLockedBlocks] = useState<TetrisBlock[]>([]); // array of blocks that are locked in
 

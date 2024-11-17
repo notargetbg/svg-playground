@@ -1,0 +1,1 @@
+export type Dispatch = React.Dispatch<{ type: string, payload?: any }>;

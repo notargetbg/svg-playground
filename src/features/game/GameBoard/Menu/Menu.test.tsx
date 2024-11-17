@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Menu from './Menu'
 import React from 'react'
-import { GameRef } from '../GameBoard.types'
 import { useGamesDispatch, useGamesState } from '../GameBoard.data'
 
 jest.mock('../GameBoard.data');
@@ -24,10 +23,9 @@ describe('Menu', () => {
 	describe('when keyboard escape is pressed and the menu is closed', () => {
 		test('should open the menu', async () => {
 			const user = userEvent.setup();
-			const gameRef = React.createRef<GameRef>();
 			const domRef = React.createRef<SVGSVGElement>();
 	
-			render(<Menu gameRef={gameRef} domRef={domRef} />);
+			render(<Menu domRef={domRef} />);
 			await user.keyboard('{Escape}');
 			expect(screen.getByText(menuTextSelector)).toBeInTheDocument()
 		})
@@ -38,10 +36,9 @@ describe('Menu', () => {
 
 		beforeEach(() => {
 			user = userEvent.setup();
-			const gameRef = React.createRef<GameRef>();
 			const domRef = React.createRef<SVGSVGElement>();
 	
-			render(<Menu gameRef={gameRef} domRef={domRef} />);
+			render(<Menu domRef={domRef} />);
 		});
 
 		test ('should close the menu', async () => {
@@ -97,10 +94,9 @@ describe('Menu', () => {
 
 	describe('when selecting a game from top menu', () => {
 		it('should start the game', async () => {
-			const gameRef = React.createRef<GameRef>();
 			const domRef = React.createRef<SVGSVGElement>();
 	
-			render(<Menu gameRef={gameRef} domRef={domRef} />);			
+			render(<Menu domRef={domRef} />);			
 		})
 	})
 		

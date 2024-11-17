@@ -5,12 +5,15 @@ import Draggable from './features/draggable/Draggable';
 import './App.css';
 import GameBoard from './features/game/GameBoard/GameBoard';
 import { GamesProvider } from './features/game/GameBoard/GameBoard.data';
+import { PromptProvider } from './features/game/hooks/PromptContext';
 
 function App() {
   return (
     <div className="App">
       <GamesProvider>
-        <GameBoard />
+        <PromptProvider>
+          <GameBoard />
+        </PromptProvider>
       </GamesProvider>      
     </div>
   );

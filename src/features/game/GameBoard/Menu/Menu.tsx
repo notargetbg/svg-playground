@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { updateGameField, useGamesDispatch, useGamesState } from "../GameBoard.data";
-import { GameRef } from "../GameBoard.types";
 import { useGameRef } from "../../hooks/useGameRef";
+import { usePromptContext } from "../../hooks/usePromptContext";
+
  /*** 
 	* Game menu
 	* Main menu: Options, Start game, Leaderboard, Quit
@@ -29,6 +30,8 @@ function Menu({ domRef }: MenuProps) {
 	const { gameBoards, activeGame, isRunning, score, statusMessage, iteration } = useGamesState();
 	const dispatch = useGamesDispatch();
 	const { gameRef } = useGameRef();
+
+	const { isShown, dispatch: dispatchPrompt } = usePromptContext()
 
 	const handleRestartGame = useCallback(() => {
 		
@@ -233,6 +236,7 @@ function Menu({ domRef }: MenuProps) {
 
 	return (
 		<nav className="menu">
+			<button onClick={() => dispatchPrompt({ type: isShown ? 'HIDE' : 'SHOW' })}>Toggle PRompt</button>
 			{statusMessage && <h3>{statusMessage} <small>iteration {iteration}</small></h3>}
 			<select onChange={chooseGame} defaultValue={activeGame}>
 				{Object.keys(gameBoards).map((game) => <option key={game} value={game} >{game}</option>)}

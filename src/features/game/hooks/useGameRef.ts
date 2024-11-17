@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { GameRef } from "../GameBoard/GameBoard.types";
 
 let gameRef: GameRef;

@@ -7,7 +7,7 @@
  * @exports Prompt
  */
 
-import usePromptReducer from '../hooks/usePromptReducer';
+import { usePromptContext} from '../hooks/usePromptContext';
 import './Prompt.css';
 
 interface PromptProps { 
@@ -17,17 +17,21 @@ interface PromptProps {
 function Prompt({ children }: PromptProps) {
 
 	// it will have bascic styling and show hide logic
-	const [show, dispatch] = usePromptReducer();
+	const { isShown, dispatch } = usePromptContext();
+
+	console.log(isShown);
 
 	// show/hide prompt
 	const togglePrompt = () => {
-		dispatch({ type: show ? 'HIDE' : 'SHOW' });
+		// dispatch({ type: isShown ? 'HIDE' : 'SHOW' });
 	}
 
 	// if (!show) return null; 
 
+	const wrapperClass = isShown ? 'prompt-wrapper show' : 'prompt-wrapper hide';
+
 	return (
-		<div className="prompt-wrapper">
+		<div className={wrapperClass}>
 			<div className="prompt" onKeyDown={togglePrompt}>
 			{children}
 			</div>
