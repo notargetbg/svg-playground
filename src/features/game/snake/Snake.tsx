@@ -7,6 +7,7 @@ import { updateGameField, useGamesDispatch } from '../GameBoard/GameBoard.data';
 import SnakeFood from './SnakeFood';
 import { GameProps } from '../GameBoard/GameBoard.types';
 import { useGameLoop } from '../hooks/useGameLoop';
+import { usePromptContext } from '../hooks/usePromptContext';
 
 /* 
     Game is working! Wohoo
@@ -282,12 +283,15 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
         
     }, [isSnakeEating, playerPosition, createFoodOutsideSnake, vGap, hGap, setScore, setDelay, delay, score]);
 
+    const { dispatch: dispatchPrompt } = usePromptContext();
     const endGame = useCallback(() => {
         dispatch({ type: 'END_GAME' });
+        dispatchPrompt({ type: 'SHOW' });
+
         // open modal with simple nice looking game over screen
         // save score to leaderboard with name input
         // call reset game after 5 seconds
-    }, [dispatch]);
+    }, [dispatch, dispatchPrompt]);
 
     // useInterval(() => {
     //     const { x, y } =  createFoodOutsideSnake(playerPosition, vGap, hGap);

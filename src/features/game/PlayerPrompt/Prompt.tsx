@@ -17,23 +17,18 @@ interface PromptProps {
 function Prompt({ children }: PromptProps) {
 
 	// it will have bascic styling and show hide logic
-	const { isShown, dispatch } = usePromptContext();
+	const { isShown } = usePromptContext();
 
-	console.log(isShown);
+	console.log(isShown);	
 
-	// show/hide prompt
-	const togglePrompt = () => {
-		// dispatch({ type: isShown ? 'HIDE' : 'SHOW' });
-	}
-
-	// if (!show) return null; 
+	if (!isShown) return null; 
 
 	const wrapperClass = isShown ? 'prompt-wrapper show' : 'prompt-wrapper hide';
 
 	return (
 		<div className={wrapperClass}>
-			<div className="prompt" onKeyDown={togglePrompt}>
-			{children}
+			<div className="prompt">
+				{children}
 			</div>
 		</div>
  	)

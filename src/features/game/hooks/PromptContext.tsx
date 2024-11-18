@@ -20,9 +20,18 @@ export const PromptProvider = ({ children }: { children: ReactNode }) => {
 		dispatch
 	}
 
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		
+		if (e.key === 'Escape') {
+			dispatch({ type: 'HIDE' });			
+		}
+	}
+
 	return (
 		<PromptContext.Provider value={contextValue}>
-			{children}
+			<div onKeyDown={handleKeyDown}>
+				{children}
+			</div>
 		</PromptContext.Provider>
 	)
 }

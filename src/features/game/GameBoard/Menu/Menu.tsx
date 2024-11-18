@@ -210,6 +210,13 @@ function Menu({ domRef }: MenuProps) {
 		}
 
 		if (e.key === 'Escape') {
+			// close prompt first if open
+			if (isShown) {
+				dispatchPrompt({ type: 'HIDE' });
+				return;
+			}
+
+			// then close menu
 			if (activeMenu !== 'mainMenu') {
 				setActiveMenu('mainMenu');
 			} else {
