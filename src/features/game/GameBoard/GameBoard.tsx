@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useEffect } from 'react';
 import Snake from '../Snake/Snake';
 import Tetris from '../Tetris';
-import { updateGameField, useGamesDispatch, useGamesState } from './GameBoard.data';
+import { useGamesDispatch, useGamesState } from './GameBoard.data';
 import GridGameboard from '../GameBoard/GridGameboard';
 import { GameRef } from './GameBoard.types';
 import { defaultKeyboardShortcuts } from './KeyboardBindings';
@@ -13,6 +13,7 @@ import Menu from './Menu/Menu';
 import { useGameRef } from '../hooks/useGameRef';
 import Prompt from '../PlayerPrompt/Prompt';
 import EndGameScreen from '../PlayerPrompt/EndGameScreen';
+import { updateGameField } from '../features/gameSlice';
 
 /* 
     Snek Game is working! Wohoo
@@ -72,7 +73,7 @@ const GameBoard = () => {
 
     return (
         <>
-            <h1 className='game-title'>{activeGame}</h1>      
+            <h1 className='game-title'>{activeGame}</h1>
             <Menu domRef={domRef} />
             {/* sidebar showing key bindings */}
             <aside className='sidebar'>

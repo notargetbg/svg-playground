@@ -3,11 +3,12 @@ import { useCallback } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { randomIntFromInterval } from '../../../app/utils';
-import { updateGameField, useGamesDispatch } from '../GameBoard/GameBoard.data';
+import { useGamesDispatch } from '../GameBoard/GameBoard.data';
 import SnakeFood from './SnakeFood';
 import { GameProps } from '../GameBoard/GameBoard.types';
 import { useGameLoop } from '../hooks/useGameLoop';
 import { usePromptContext } from '../hooks/usePromptContext';
+import { updateGameField } from '../features/gameSlice';
 
 /* 
     Game is working! Wohoo
@@ -285,9 +286,10 @@ const SnakeGame = React.forwardRef(({ isRunning, blocksCount, vGap, hGap, setSco
 
     const { dispatch: dispatchPrompt } = usePromptContext();
     const endGame = useCallback(() => {
+
         dispatch({ type: 'END_GAME' });
         dispatchPrompt({ type: 'SHOW' });
-
+        dispatch({ type: 'RESTART_GAME' });
         // open modal with simple nice looking game over screen
         // save score to leaderboard with name input
         // call reset game after 5 seconds

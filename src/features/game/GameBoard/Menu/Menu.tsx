@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { updateGameField, useGamesDispatch, useGamesState } from "../GameBoard.data";
+import { gameSlice } from "../../features";
+import { useGamesDispatch, useGamesState } from "../GameBoard.data";
 import { useGameRef } from "../../hooks/useGameRef";
 import { usePromptContext } from "../../hooks/usePromptContext";
+import { updateGameField } from "../../features/gameSlice";
 
  /*** 
 	* Game menu
@@ -185,6 +187,13 @@ function Menu({ domRef }: MenuProps) {
 	}
 
 	const handleKeyPress = useCallback((e: KeyboardEvent) => {
+		
+		if (e.key === 'F1') {
+			e.preventDefault();
+			// pause/unpause game
+			handleTogglePauseGame();
+		}
+
 		if (e.key === 'F5') {
 			e.preventDefault();
 			// save game
@@ -203,15 +212,10 @@ function Menu({ domRef }: MenuProps) {
 			handleRestartGame();
 		}
 
-		if (e.key === 'F1') {
-			e.preventDefault();
-			// pause/unpause game
-			handleTogglePauseGame();
-		}
-
 		if (e.key === 'Escape') {
 			// close prompt first if open
 			if (isShown) {
+				handleRestartGame();
 				dispatchPrompt({ type: 'HIDE' });
 				return;
 			}
@@ -224,7 +228,7 @@ function Menu({ domRef }: MenuProps) {
 			}
 		}
 
-	}, [activeMenu, handleSaveGame, handleLoadGame, handleRestartGame, handleTogglePauseGame]);
+	}, [handleSaveGame, handleLoadGame, handleRestartGame, handleTogglePauseGame, isShown, activeMenu, dispatchPrompt]);
 
 	useEffect(() => {
 		window.addEventListener('keydown', handleKeyPress);

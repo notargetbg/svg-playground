@@ -1,5 +1,6 @@
 import { createContext, Dispatch, useReducer, ReactNode, useContext } from 'react';
 import { GameBoards, GameState } from './GameBoard.types';
+import { gameSlice } from '../features';
 
 // All game boards as a board configuration
 const gameBoards: GameBoards = {
@@ -50,7 +51,7 @@ interface GamesProviderProps {
 }
 
 export function GamesProvider({ children }: GamesProviderProps) {
-	const [gameBoard, dispatch] = useReducer(gamesReducer, getIntialState());
+	const [gameBoard, dispatch] = useReducer(gameSlice.gamesReducer, getIntialState());
 
 	return (
 		<GamesContext.Provider value={gameBoard}>
@@ -76,37 +77,4 @@ export function useGamesDispatch(): Dispatch<{ type: string, payload?: any }> {
 	}
 
 	return useContext(GamesDispatchContext);
-}
-
-// export action creators
-
-export function setGame(game: string) {
-	return { type: 'SET_GAME', payload: game }
-}
-
-export function updateGameField(field: string, value: any) {
-	return { type: 'UPDATE_GAME_FIELD', payload: { field, value } }
-}
-
-function gamesReducer(gameState: GameState, action: any ) {
-	switch (action.type) {
-
-		// when choosing a game, we set active game string key
-		case 'SET_GAME':
-			return { ...gameState, activeGame: action.payload }
-		case 'TOGGLE_PAUSE_GAME':
-			return { ...gameState, isRunning: !gameState.isRunning, statusMessage: !gameState.isRunning ? 'Game running' : 'PAUSED' } 
-		case 'LOAD_GAME':
-			return { ...gameState, isRunning: false, activeGame: action.payload.gameName }
-		case 'END_GAME':
-			return { ...gameState, isRunning: false, gameState: 'Game Over!' }
-		case 'RESTART_GAME':
-			return { ...gameState, isRunning: true }
-		case 'UPDATE_GAME_FIELD': {
-			return { ...gameState, [action.payload.field]: action.payload.value }
-		}
-
-		default:
-			return gameState;
-	}
 }
